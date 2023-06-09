@@ -6,8 +6,14 @@
 
 int main()
 {
-    cv::Mat blackImage(cv::Mat::zeros(512, 512, 0));
-    cv::imshow("black", blackImage);
+    cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test.jpg");
+    if (img.empty())
+    {
+        std::cerr << "failed to read image\n";
+        exit(EXIT_FAILURE);
+    }
+
+    cv::imshow("img", img);
     cv::waitKey();
     return 0;
 }
