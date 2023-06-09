@@ -13,6 +13,8 @@ int main()
         exit(EXIT_FAILURE);
     }
 
+    cv::circle(img, {50, 50}, 30, cv::Scalar(200, 100, 200), 5);
+
     cv::imshow("img", img);
     cv::waitKey();
     return 0;
