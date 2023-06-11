@@ -125,6 +125,36 @@ public:
         return {mcX, mcY};
     }
 
+    double computeCentralMoment(const int i, const int j, const cv::Point2d& massCenter) const
+    {
+        double mij = 0;
+        const int w = width();
+        const int h = height();
+
+        for (int x = 0; x < w; x++)
+        {
+            for (int y = 0; y < h; y++)
+            {
+                if (_areaImg.at<char>(y, x) == WHITE)
+                {
+                    mij += cv::pow(x - massCenter.x, i) * cv::pow(y - massCenter.y, j);
+                }
+            }
+        }
+
+        return mij;
+    }
+
+    double computeElongation(const cv::Point2d& massCenter) const
+    {
+        const double m20 = computeCentralMoment(2, 0, massCenter);
+        const double m02 = computeCentralMoment(0, 2, massCenter);
+        const double m11 = computeCentralMoment(1, 1, massCenter);
+        const double sqrt = cv::sqrt((m20 - m02) * (m20 - m02) + 4 * m11*m11);
+        const double elongation = (m20 + m02 + sqrt) / (m20 + m02 - sqrt);
+        return elongation;
+    }
+
     void addPoint(const int x, const int y, const char color)
     {
         int xOnArea = x - _leftTop.x;
@@ -224,8 +254,14 @@ void findAreasInBinaryImg(const cv::Mat& binaryImg, std::vector<Area>& areas)
             constructAreaFrom(newArea, x, y, binaryImg, visited);
 
             const cv::Point2d mc = newArea.computeMassCenter(newArea.computeArea());
-            std::cout << "new area mass center: " << mc.x << ", " << mc.y << "\n";
-            newArea.show("new area");
+//            std::cout << "new area mass center: " << mc.x << ", " << mc.y << "\n";
+//            std::cout << "new area elongation: " << newArea.computeElongation(mc) << "\n";
+//            std::cout << "new area perimeter: " << newArea.computePerimeter() << "\n";
+//            std::cout << "new area area: " << newArea.computeArea() << "\n";
+//            std::cout << "new area compactness: " << newArea.computeCompactness(
+//                    newArea.computePerimeter(),
+//                    newArea.computeArea()) << "\n";
+//            newArea.show("new area");
 
             areas.push_back(newArea);
         }
