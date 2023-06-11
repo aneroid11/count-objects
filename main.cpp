@@ -32,6 +32,12 @@ public:
         _areaImg = cv::Mat::zeros(height, width, 0); // CV_8U
     }
 
+    void show(const std::string& title) const
+    {
+        cv::imshow(title, _areaImg);
+        cv::waitKey();
+    }
+
     int width() const { return _areaImg.cols; }
     int height() const { return _areaImg.rows; }
 
@@ -39,33 +45,58 @@ public:
 
     void addPoint(const int x, const int y, const char color)
     {
-        const int xOnArea = x - _leftTop.x;
-        const int yOnArea = y - _leftTop.y;
+        int xOnArea = x - _leftTop.x;
+        int yOnArea = y - _leftTop.y;
+
+        if (xOnArea < 0)
+        {
+            _leftTop.x += xOnArea;
+            addColumnsLeft(abs(xOnArea));
+            xOnArea = 0;
+        }
+        if (yOnArea < 0)
+        {
+            _leftTop.y += yOnArea;
+            addRowsTop(abs(yOnArea));
+            yOnArea = 0;
+        }
+        if (xOnArea >= _areaImg.cols)
+        {
+            const int colsToAdd = xOnArea - _areaImg.cols + 1;
+            addColumnsRight(colsToAdd);
+        }
+        if (yOnArea >= _areaImg.rows)
+        {
+            const int rowsToAdd = yOnArea - _areaImg.rows + 1;
+            addRowsBottom(rowsToAdd);
+        }
+
+        _areaImg.at<char>(yOnArea, xOnArea) = color;
     }
 
-    void addColumnLeft()
+    void addColumnsLeft(int num)
     {
         // the column is a cv::Mat (width = 1, height = _areaImg.height)
-        cv::Mat newColumn = cv::Mat::zeros(_areaImg.rows, 1, 0);
-        cv::hconcat(newColumn, _areaImg, _areaImg);
+        cv::Mat newColumns = cv::Mat::zeros(_areaImg.rows, num, 0);
+        cv::hconcat(newColumns, _areaImg, _areaImg);
     }
 
-    void addColumnRight()
+    void addColumnsRight(int num)
     {
-        cv::Mat newColumn = cv::Mat::zeros(_areaImg.rows, 1, 0);
-        cv::hconcat(_areaImg, newColumn, _areaImg);
+        cv::Mat newColumns = cv::Mat::zeros(_areaImg.rows, num, 0);
+        cv::hconcat(_areaImg, newColumns, _areaImg);
     }
 
-    void addRowTop()
+    void addRowsTop(int num)
     {
-        cv::Mat newRow = cv::Mat::zeros(1, _areaImg.cols, 0);
-        cv::vconcat(newRow, _areaImg, _areaImg);
+        cv::Mat newRows = cv::Mat::zeros(num, _areaImg.cols, 0);
+        cv::vconcat(newRows, _areaImg, _areaImg);
     }
 
-    void addRowBottom()
+    void addRowsBottom(int num)
     {
-        cv::Mat newRow = cv::Mat::zeros(1, _areaImg.cols, 0);
-        cv::vconcat(_areaImg, newRow, _areaImg);
+        cv::Mat newRows = cv::Mat::zeros(num, _areaImg.cols, 0);
+        cv::vconcat(_areaImg, newRows, _areaImg);
     }
 
 private:
@@ -110,6 +141,8 @@ void findAreasInBinaryImg(const cv::Mat& binaryImg, std::vector<Area>& areas)
             // now we have a white pixel not visited before
             Area newArea(x, y, 0, 0);
             constructAreaFrom(newArea, x, y, binaryImg, visited);
+
+            newArea.show("new area");
             areas.push_back(newArea);
         }
     }
