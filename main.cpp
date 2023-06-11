@@ -32,15 +32,10 @@ int main()
     cv::Mat binaryImg;
     cv::threshold(blurredImg, binaryImg, 0, 255,
                   cv::THRESH_BINARY_INV + cv::THRESH_OTSU);
+    
+//    cv::findContours(binaryImg, )
 
     cv::imshow("window", binaryImg);
-//    cv::circle(img, {50, 50}, 30, cv::Scalar(200, 100, 200), 5);
-//    cv::Mat templateImg = cv::imread("/home/lucky/dev/6sem/practice/count-objects/template.jpg");
-
-//    cv::Mat result;
-//    cv::matchTemplate(img, templateImg, result, cv::TM_CCOEFF_NORMED);
-
-//    cv::imshow("matchTemplate", result);
 
     cv::waitKey();
     return 0;
