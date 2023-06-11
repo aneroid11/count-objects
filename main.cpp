@@ -94,6 +94,37 @@ public:
         return perimeter;
     }
 
+    static double computeCompactness(const int perimeter, const int area)
+    {
+        return static_cast<double>(perimeter * perimeter) / area;
+    }
+
+    cv::Point2d computeMassCenter(const int area) const
+    {
+        double sumX = 0, sumY = 0;
+        const int w = width();
+        const int h = height();
+
+        for (int x = 0; x < w; x++)
+        {
+            for (int y = 0; y < h; y++)
+            {
+                if (_areaImg.at<char>(y, x) == WHITE) { sumX += x; }
+            }
+        }
+        for (int x = 0; x < w; x++)
+        {
+            for (int y = 0; y < h; y++)
+            {
+                if (_areaImg.at<char>(y, x) == WHITE) { sumY += y; }
+            }
+        }
+
+        double mcX = sumX / area;
+        double mcY = sumY / area;
+        return {mcX, mcY};
+    }
+
     void addPoint(const int x, const int y, const char color)
     {
         int xOnArea = x - _leftTop.x;
@@ -191,6 +222,10 @@ void findAreasInBinaryImg(const cv::Mat& binaryImg, std::vector<Area>& areas)
             // now we have a white pixel not visited before
             Area newArea(x, y, 0, 0);
             constructAreaFrom(newArea, x, y, binaryImg, visited);
+
+            const cv::Point2d mc = newArea.computeMassCenter(newArea.computeArea());
+            std::cout << "new area mass center: " << mc.x << ", " << mc.y << "\n";
+            newArea.show("new area");
 
             areas.push_back(newArea);
         }
