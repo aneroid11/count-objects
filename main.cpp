@@ -29,7 +29,43 @@ class Area
 public:
     Area(const int x, const int y, const int width, const int height) : _leftTop(x, y)
     {
-        _areaImg = cv::Mat::zeros(width, height, 0); // CV_8U
+        _areaImg = cv::Mat::zeros(height, width, 0); // CV_8U
+    }
+
+    int width() const { return _areaImg.cols; }
+    int height() const { return _areaImg.rows; }
+
+    cv::Point leftTop() const { return _leftTop; }
+
+    void addPoint(const int x, const int y, const char color)
+    {
+        const int xOnArea = x - _leftTop.x;
+        const int yOnArea = y - _leftTop.y;
+    }
+
+    void addColumnLeft()
+    {
+        // the column is a cv::Mat (width = 1, height = _areaImg.height)
+        cv::Mat newColumn = cv::Mat::zeros(_areaImg.rows, 1, 0);
+        cv::hconcat(newColumn, _areaImg, _areaImg);
+    }
+
+    void addColumnRight()
+    {
+        cv::Mat newColumn = cv::Mat::zeros(_areaImg.rows, 1, 0);
+        cv::hconcat(_areaImg, newColumn, _areaImg);
+    }
+
+    void addRowTop()
+    {
+        cv::Mat newRow = cv::Mat::zeros(1, _areaImg.cols, 0);
+        cv::vconcat(newRow, _areaImg, _areaImg);
+    }
+
+    void addRowBottom()
+    {
+        cv::Mat newRow = cv::Mat::zeros(1, _areaImg.cols, 0);
+        cv::vconcat(_areaImg, newRow, _areaImg);
     }
 
 private:
@@ -45,6 +81,9 @@ void constructAreaFrom(Area& area, int x, int y, const cv::Mat& binaryImg, std::
 
     if (x >= 0 && x < imgW && y >= 0 && y < imgH && !visited[y * imgW + x] && binaryImg.at<char>(y, x) == WHITE)
     {
+        // add this point to the area
+        area.addPoint(x, y, binaryImg.at<char>(y, x));
+
         visited[y * imgW + x] = true;
         constructAreaFrom(area, x - 1, y, binaryImg, visited);
         constructAreaFrom(area, x + 1, y, binaryImg, visited);
@@ -63,7 +102,8 @@ void findAreasInBinaryImg(const cv::Mat& binaryImg, std::vector<Area>& areas)
     {
         for (int y = 0; y < imgH; y++)
         {
-            if (visited[y * imgW + x] || binaryImg.at<char>(y, x) == BLACK) {
+            if (visited[y * imgW + x] || binaryImg.at<char>(y, x) == BLACK)
+            {
                 continue;
             }
 
@@ -73,8 +113,6 @@ void findAreasInBinaryImg(const cv::Mat& binaryImg, std::vector<Area>& areas)
             areas.push_back(newArea);
         }
     }
-
-//    std::cout << "total areas found: " << numAreas << "\n";
 }
 
 int main()
@@ -95,6 +133,14 @@ int main()
 //    cv::findContours(binaryImg, )
     std::vector<Area> areas;
     findAreasInBinaryImg(binaryImg, areas);
+
+    std::cout << "areas info: \n\n";
+    for (const Area& a : areas)
+    {
+        std::cout << "area:\n";
+        std::cout << "left top: " << a.leftTop().x << ", " << a.leftTop().y << "\n";
+        std::cout << "width, height: " << a.width() << ", " << a.height() << "\n\n";
+    }
 
     std::cout << "Areas found: " << areas.size() << "\n";
 
