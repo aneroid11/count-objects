@@ -43,6 +43,27 @@ public:
 
     cv::Point leftTop() const { return _leftTop; }
 
+    int computeArea() const
+    {
+        // the number of pixels in the object. that means the number of white pixels.
+        int area = 0;
+        const int w = width();
+        const int h = height();
+
+        for (int x = 0; x < w; x++)
+        {
+            for (int y = 0; y < h; y++)
+            {
+                if (_areaImg.at<char>(y, x) == WHITE)
+                {
+                    area++;
+                }
+            }
+        }
+
+        return area;
+    }
+
     void addPoint(const int x, const int y, const char color)
     {
         int xOnArea = x - _leftTop.x;
@@ -104,7 +125,6 @@ private:
     cv::Point _leftTop;
 };
 
-//Area constructAreaFrom(int x, int y, const cv::Mat& binaryImg, std::vector<bool>& visited)
 void constructAreaFrom(Area& area, int x, int y, const cv::Mat& binaryImg, std::vector<bool>& visited)
 {
     const int imgW = binaryImg.cols;
@@ -142,7 +162,6 @@ void findAreasInBinaryImg(const cv::Mat& binaryImg, std::vector<Area>& areas)
             Area newArea(x, y, 0, 0);
             constructAreaFrom(newArea, x, y, binaryImg, visited);
 
-            newArea.show("new area");
             areas.push_back(newArea);
         }
     }
@@ -161,12 +180,10 @@ int main()
     cv::threshold(blurredImg, binaryImg, 0, 255,
                   cv::THRESH_BINARY + cv::THRESH_OTSU);
 
-//    std::cout << binaryImg.type() << "\n";
-
-//    cv::findContours(binaryImg, )
     std::vector<Area> areas;
     findAreasInBinaryImg(binaryImg, areas);
 
+    std::cout << "areas found: " << areas.size() << "\n";
     std::cout << "areas info: \n\n";
     for (const Area& a : areas)
     {
@@ -174,8 +191,6 @@ int main()
         std::cout << "left top: " << a.leftTop().x << ", " << a.leftTop().y << "\n";
         std::cout << "width, height: " << a.width() << ", " << a.height() << "\n\n";
     }
-
-    std::cout << "Areas found: " << areas.size() << "\n";
 
     cv::imshow("window", binaryImg);
 
