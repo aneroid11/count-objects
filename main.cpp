@@ -64,6 +64,36 @@ public:
         return area;
     }
 
+    int computePerimeter() const
+    {
+        int perimeter = 0;
+        const int w = width();
+        const int h = height();
+
+        for (int x = 0; x < w; x++)
+        {
+            for (int y = 0; y < h; y++)
+            {
+                if (_areaImg.at<char>(y, x) == WHITE)
+                {
+                    if (x == 0 || y == 0 || x == w - 1 || y == h - 1)
+                    {
+                        perimeter++;
+                    }
+                    else if (_areaImg.at<char>(y, x - 1) != WHITE ||
+                            _areaImg.at<char>(y, x + 1) != WHITE ||
+                            _areaImg.at<char>(y - 1, x) != WHITE ||
+                            _areaImg.at<char>(y + 1, x) != WHITE)
+                    {
+                        perimeter++;
+                    }
+                }
+            }
+        }
+
+        return perimeter;
+    }
+
     void addPoint(const int x, const int y, const char color)
     {
         int xOnArea = x - _leftTop.x;
