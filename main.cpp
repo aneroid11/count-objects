@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -20,17 +21,61 @@
 //cv2.imwrite('image.png', image)
 //cv2.waitKey()
 
+const char BLACK = 0;
+const char WHITE = static_cast<char>(255);
+
 class Area
 {
 public:
-    Area(const int width, const int height)
+    Area(const int x, const int y, const int width, const int height) : _leftTop(x, y)
     {
-        _areaImg = cv::Mat::zeros(width, height, 0);
+        _areaImg = cv::Mat::zeros(width, height, 0); // CV_8U
     }
 
 private:
     cv::Mat _areaImg;
+    cv::Point _leftTop;
 };
+
+//Area constructAreaFrom(int x, int y, const cv::Mat& binaryImg, std::vector<bool>& visited)
+void constructAreaFrom(Area& area, int x, int y, const cv::Mat& binaryImg, std::vector<bool>& visited)
+{
+    const int imgW = binaryImg.cols;
+    const int imgH = binaryImg.rows;
+
+    if (x >= 0 && x < imgW && y >= 0 && y < imgH && !visited[y * imgW + x] && binaryImg.at<char>(y, x) == WHITE)
+    {
+        visited[y * imgW + x] = true;
+        constructAreaFrom(area, x - 1, y, binaryImg, visited);
+        constructAreaFrom(area, x + 1, y, binaryImg, visited);
+        constructAreaFrom(area, x, y - 1, binaryImg, visited);
+        constructAreaFrom(area, x, y + 1, binaryImg, visited);
+    }
+}
+
+void findAreasInBinaryImg(const cv::Mat& binaryImg, std::vector<Area>& areas)
+{
+    const int imgW = binaryImg.cols;
+    const int imgH = binaryImg.rows;
+    std::vector<bool> visited(imgW * imgH, false);
+
+    for (int x = 0; x < imgW; x++)
+    {
+        for (int y = 0; y < imgH; y++)
+        {
+            if (visited[y * imgW + x] || binaryImg.at<char>(y, x) == BLACK) {
+                continue;
+            }
+
+            // now we have a white pixel not visited before
+            Area newArea(x, y, 0, 0);
+            constructAreaFrom(newArea, x, y, binaryImg, visited);
+            areas.push_back(newArea);
+        }
+    }
+
+//    std::cout << "total areas found: " << numAreas << "\n";
+}
 
 int main()
 {
@@ -45,9 +90,13 @@ int main()
     cv::threshold(blurredImg, binaryImg, 0, 255,
                   cv::THRESH_BINARY + cv::THRESH_OTSU);
 
-    std::cout << binaryImg.type() << "\n";
+//    std::cout << binaryImg.type() << "\n";
 
 //    cv::findContours(binaryImg, )
+    std::vector<Area> areas;
+    findAreasInBinaryImg(binaryImg, areas);
+
+    std::cout << "Areas found: " << areas.size() << "\n";
 
     cv::imshow("window", binaryImg);
 
