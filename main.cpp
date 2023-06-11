@@ -20,6 +20,18 @@
 //cv2.imwrite('image.png', image)
 //cv2.waitKey()
 
+class Area
+{
+public:
+    Area(const int width, const int height)
+    {
+        _areaImg = cv::Mat::zeros(width, height, 0);
+    }
+
+private:
+    cv::Mat _areaImg;
+};
+
 int main()
 {
     cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test2.jpg");
@@ -31,8 +43,10 @@ int main()
 
     cv::Mat binaryImg;
     cv::threshold(blurredImg, binaryImg, 0, 255,
-                  cv::THRESH_BINARY_INV + cv::THRESH_OTSU);
-    
+                  cv::THRESH_BINARY + cv::THRESH_OTSU);
+
+    std::cout << binaryImg.type() << "\n";
+
 //    cv::findContours(binaryImg, )
 
     cv::imshow("window", binaryImg);
