@@ -14,7 +14,7 @@ struct Pixel
 int main()
 {
     cv::Mat img = cv::imread("../test3.jpg");
-//    cv::Mat img = cv::imread("../test.png");
+//    cv::Mat img = cv::imread("../test4.png");
     cv::Mat edged;
     cv::Canny(img, edged, 10, 250);
 
@@ -33,29 +33,7 @@ int main()
 
 //    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
 
-    cv::Ptr<cv::ORB> orbDetector;
-    // Default parameters of ORB
-    {
-        int nfeatures = 500;
-        float scaleFactor = 1.2f;
-        int nlevels = 8;
-        int edgeThreshold = 15; // Changed default (31);
-        int firstLevel = 0;
-        int WTA_K = 2;
-        cv::ORB::ScoreType scoreType = cv::ORB::HARRIS_SCORE;
-        int patchSize = 31;
-        int fastThreshold = 20;
-        orbDetector = cv::ORB::create(
-                nfeatures,
-                scaleFactor,
-                nlevels,
-                edgeThreshold,
-                firstLevel,
-                WTA_K,
-                scoreType,
-                patchSize,
-                fastThreshold);
-    }
+    cv::Ptr<cv::ORB> orbDetector = cv::ORB::create();
 
 //    std::vector<cv::KeyPoint> keypoints;
 //    orbDetector->detect(img, keypoints);
@@ -94,6 +72,11 @@ int main()
                 }
             }
         }
+
+        cv::copyMakeBorder(newObj, newObj,
+                           100, 100, 100, 100,
+                           cv::BORDER_CONSTANT,
+                           cv::Scalar(255, 255, 255));
 
         std::vector<cv::KeyPoint> keypoints;
         orbDetector->detect(newObj, keypoints);
