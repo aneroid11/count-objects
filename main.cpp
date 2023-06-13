@@ -347,16 +347,25 @@ int main()
 
     std::cout << contours.size() << "\n"; // 5 contours found.
 
-    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 1);
-    cv::imshow("window", img);
-    cv::waitKey();
+    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
+//    cv::imshow("window", img);
+//    cv::waitKey();
 
 //    for (int i = 0; i < contours.size(); i++)
 //    {
 //        const double perimeter = cv::arcLength(contours[i], true);
+//        std::cout << perimeter << "\n";
+//
 //        std::vector<cv::Point> approxCurve;
 //        cv::approxPolyDP(contours[i], approxCurve, 0.02 * perimeter, true);
+//        std::cout << "approxPolyDP\n";
+//
+//        std::cout << approxCurve.size() << "\n";
+//
+//        cv::drawContours(img, {approxCurve}, 0, cv::Scalar(0, 0, 255), 4);
 //    }
+    cv::imshow("window", img);
+    cv::waitKey();
 
 //    cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test3.jpg");
 //    cv::Mat grayImg;
