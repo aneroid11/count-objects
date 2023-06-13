@@ -317,18 +317,29 @@ void normalizeAreasCharacteristics(const std::vector<std::vector<double>>& chara
     }
 }
 
+void classifyAreas(const std::vector<std::vector<double>>& characteristics,
+                   const std::vector<Area>& areas,
+                   std::vector<std::vector<Area>>& clusters)
+{
+    clusters.clear();
+
+}
+
 int main()
 {
-    cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test2.jpg");
+    cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test3.jpg");
     cv::Mat grayImg;
-    cv::cvtColor(img, grayImg, cv::COLOR_RGB2GRAY);
+    cv::cvtColor(img, grayImg, cv::COLOR_BGR2GRAY);
 
     cv::Mat blurredImg;
-    cv::GaussianBlur(grayImg, blurredImg, cv::Size(15, 15), 0);
+    cv::GaussianBlur(grayImg, blurredImg, cv::Size(5, 5), 0);
+
+    cv::imshow("window", blurredImg);
+    cv::waitKey();
 
     cv::Mat binaryImg;
     cv::threshold(blurredImg, binaryImg, 0, 255,
-                  cv::THRESH_BINARY + cv::THRESH_OTSU);
+                  cv::THRESH_BINARY_INV + cv::THRESH_OTSU);
 
     std::vector<Area> areas;
     findAreasInBinaryImg(binaryImg, areas);
@@ -361,7 +372,7 @@ int main()
     }
 
     cv::imshow("window", binaryImg);
-
     cv::waitKey();
+
     return 0;
 }
