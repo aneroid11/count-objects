@@ -332,20 +332,31 @@ int main()
     cv::Mat edged;
     cv::Canny(img, edged, 10, 250);
 
-    cv::imshow("window", edged);
-    cv::waitKey();
+//    cv::imshow("window", edged);
+//    cv::waitKey();
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
     cv::Mat closed;
     cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
 
-    cv::imshow("window", closed);
-    cv::waitKey();
+//    cv::imshow("window", closed);
+//    cv::waitKey();
 
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     std::cout << contours.size() << "\n"; // 5 contours found.
+
+    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 1);
+    cv::imshow("window", img);
+    cv::waitKey();
+
+//    for (int i = 0; i < contours.size(); i++)
+//    {
+//        const double perimeter = cv::arcLength(contours[i], true);
+//        std::vector<cv::Point> approxCurve;
+//        cv::approxPolyDP(contours[i], approxCurve, 0.02 * perimeter, true);
+//    }
 
 //    cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test3.jpg");
 //    cv::Mat grayImg;
