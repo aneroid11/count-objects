@@ -4,6 +4,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/features2d.hpp>
 
 struct Pixel
 {
@@ -32,13 +33,42 @@ int main()
 
 //    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
 
+    cv::Ptr<cv::ORB> orbDetector;
+    // Default parameters of ORB
+    {
+        int nfeatures = 500;
+        float scaleFactor = 1.2f;
+        int nlevels = 8;
+        int edgeThreshold = 15; // Changed default (31);
+        int firstLevel = 0;
+        int WTA_K = 2;
+        cv::ORB::ScoreType scoreType = cv::ORB::HARRIS_SCORE;
+        int patchSize = 31;
+        int fastThreshold = 20;
+        orbDetector = cv::ORB::create(
+                nfeatures,
+                scaleFactor,
+                nlevels,
+                edgeThreshold,
+                firstLevel,
+                WTA_K,
+                scoreType,
+                patchSize,
+                fastThreshold);
+    }
+
+//    std::vector<cv::KeyPoint> keypoints;
+//    orbDetector->detect(img, keypoints);
+//    cv::drawKeypoints(img, keypoints, img, cv::Scalar(255, 0, 0));
+//    cv::imshow("img", img);
+//    cv::waitKey();
+//    exit(1);
+
     std::vector<cv::Mat> objects;
     for (const auto& cont : contours)
     {
         cv::Rect bounds = cv::boundingRect(cont);
         cv::Mat newObj = cv::Mat::zeros(bounds.height, bounds.width, img.type());
-
-        std::cout << img.type() << "\n";
 
         if (bounds.width < 30 && bounds.height < 30) { continue; }
 
@@ -46,22 +76,31 @@ int main()
         {
             for (int y = 0; y < bounds.height; y++)
             {
+//                newObj.at<Pixel>(y, x) = img.at<Pixel>(y + bounds.y, x + bounds.x);
                 // check if this point is inside the contour
-                double result = cv::pointPolygonTest(cont,
+                double dist = cv::pointPolygonTest(cont,
                                                      {static_cast<float>(bounds.x + x),
                                                       static_cast<float>(bounds.y + y)},
                                                       false);
-                if (result >= 0) // inside or on the contour
+                if (dist >= 0)
                 {
                     newObj.at<Pixel>(y, x) = img.at<Pixel>(y + bounds.y, x + bounds.x);
                 }
                 else
                 {
-                    // outside
-//                    newObj.at<cv::Scalar>(y, x) = cv::Scalar(255, 255, 255);
+                    newObj.at<Pixel>(y, x) = Pixel { static_cast<char>(255),
+                                                     static_cast<char>(255),
+                                                     static_cast<char>(255) };
                 }
             }
         }
+
+        std::vector<cv::KeyPoint> keypoints;
+        orbDetector->detect(newObj, keypoints);
+
+        std::cout << "Number of keypoints: " << keypoints.size() << "\n";
+
+        cv::drawKeypoints(newObj, keypoints, newObj, cv::Scalar(255, 0, 0));
 
         cv::imshow("newObj", newObj);
         cv::waitKey();
