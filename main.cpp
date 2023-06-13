@@ -328,11 +328,24 @@ void classifyAreas(const std::vector<std::vector<double>>& characteristics,
 int main()
 {
     cv::Mat img = cv::imread("../test3.jpg");
+//    cv::Mat img = cv::imread("../test.png");
     cv::Mat edged;
     cv::Canny(img, edged, 10, 250);
 
     cv::imshow("window", edged);
     cv::waitKey();
+
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
+    cv::Mat closed;
+    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
+
+    cv::imshow("window", closed);
+    cv::waitKey();
+
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    std::cout << contours.size() << "\n"; // 5 contours found.
 
 //    cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test3.jpg");
 //    cv::Mat grayImg;
