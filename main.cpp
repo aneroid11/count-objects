@@ -268,6 +268,27 @@ void findAreasInBinaryImg(const cv::Mat& binaryImg, std::vector<Area>& areas)
     }
 }
 
+void computeAreasCharacteristics(const std::vector<Area>& areas, std::vector<std::vector<double>>& characteristics)
+{
+    for (const Area& a : areas)
+    {
+        std::vector<double> currChars;
+        currChars.push_back(a.computePerimeter());
+        currChars.push_back(a.computeArea());
+        currChars.push_back(Area::computeCompactness(currChars[0], currChars[1]));
+        currChars.push_back(a.computeElongation(a.computeMassCenter(currChars[1])));
+    }
+}
+
+void normalizeAreasCharacteristics(const std::vector<std::vector<double>>& characteristics,
+                                   std::vector<double>& normalized)
+{
+    const int numChars = characteristics[0].size();
+    std::vector<double> maxChars = characteristics[0];
+
+    for (int i = 0; i < characteristics.size(); i++) {}
+}
+
 int main()
 {
     cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test2.jpg");
@@ -283,6 +304,11 @@ int main()
 
     std::vector<Area> areas;
     findAreasInBinaryImg(binaryImg, areas);
+
+    std::vector<std::vector<double>> areasCharacteristics;
+    computeAreasCharacteristics(areas, areasCharacteristics);
+    std::vector<std::vector<double>> normCharacteristics;
+//    normalizeAreasCharacteristics(areasCharacteristics, normCharacteristics);
 
     std::cout << "areas found: " << areas.size() << "\n";
     std::cout << "areas info: \n\n";
