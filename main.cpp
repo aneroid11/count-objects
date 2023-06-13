@@ -78,12 +78,10 @@ int main()
                            cv::BORDER_CONSTANT,
                            cv::Scalar(255, 255, 255));
 
-        std::vector<cv::KeyPoint> keypoints;
-        orbDetector->detect(newObj, keypoints);
-
-        std::cout << "Number of keypoints: " << keypoints.size() << "\n";
-
-        cv::drawKeypoints(newObj, keypoints, newObj, cv::Scalar(255, 0, 0));
+//        std::vector<cv::KeyPoint> keypoints;
+//        orbDetector->detect(newObj, keypoints);
+//        std::cout << "Number of keypoints: " << keypoints.size() << "\n";
+//        cv::drawKeypoints(newObj, keypoints, newObj, cv::Scalar(255, 0, 0));
 
         cv::imshow("newObj", newObj);
         cv::waitKey();
