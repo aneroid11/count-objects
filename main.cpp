@@ -13,7 +13,7 @@ struct Pixel
 
 int main()
 {
-    cv::Mat img = cv::imread("../test3.jpg");
+    cv::Mat img = cv::imread("../test3.jpg", cv::IMREAD_GRAYSCALE);
 //    cv::Mat img = cv::imread("../test4.png");
     cv::Mat edged;
     cv::Canny(img, edged, 10, 250);
@@ -62,17 +62,17 @@ int main()
                                                       false);
                 if (dist >= 0)
                 {
-                    newObj.at<Pixel>(y, x) = img.at<Pixel>(y + bounds.y, x + bounds.x);
+//                    newObj.at<Pixel>(y, x) = img.at<Pixel>(y + bounds.y, x + bounds.x);
+                    newObj.at<char>(y, x) = img.at<char>(y + bounds.y, x + bounds.x);
                 }
                 else
                 {
-                    newObj.at<Pixel>(y, x) = Pixel { static_cast<char>(255),
-                                                     static_cast<char>(255),
-                                                     static_cast<char>(255) };
+                    newObj.at<char>(y, x) = static_cast<char>(255);
                 }
             }
         }
 
+        // we need a larger image to find more key points
         cv::copyMakeBorder(newObj, newObj,
                            100, 100, 100, 100,
                            cv::BORDER_CONSTANT,
@@ -80,16 +80,55 @@ int main()
 
 //        std::vector<cv::KeyPoint> keypoints;
 //        orbDetector->detect(newObj, keypoints);
-//        std::cout << "Number of keypoints: " << keypoints.size() << "\n";
 //        cv::drawKeypoints(newObj, keypoints, newObj, cv::Scalar(255, 0, 0));
-
-        cv::imshow("newObj", newObj);
-        cv::waitKey();
+//
+//        cv::imshow("newObj", newObj);
+//        cv::waitKey();
 
         objects.push_back(newObj);
     }
 
     std::cout << "total objects: " << objects.size() << "\n";
+
+    std::vector<std::vector<cv::KeyPoint>> objectsKeypoints;
+    std::vector<cv::Mat> objectsDescriptors;
+
+    // find key points and descriptors for all the objects
+    for (int i = 0; i < objects.size(); i++)
+    {
+        std::vector<cv::KeyPoint> keypoints;
+        cv::Mat descriptors;
+
+        orbDetector->detectAndCompute(objects[i], cv::noArray(),
+                                      keypoints, descriptors);
+
+        std::cout << "Number of keypoints: " << keypoints.size() << "\n";
+
+        objectsKeypoints.push_back(keypoints);
+        objectsDescriptors.push_back(descriptors);
+    }
+
+    cv::BFMatcher bfmatcher(cv::NORM_HAMMING, true);
+
+    std::vector<cv::DMatch> matches;
+    const int O1 = 1;
+    const int O2 = 4;
+    bfmatcher.match(objectsDescriptors[O1], objectsDescriptors[O2], matches);
+
+    std::vector<cv::DMatch> matchesToDraw = matches;
+//    for (int i = 0; i < 20; i++)
+//    {
+//        matchesToDraw.push_back(matches[i]);
+//    }
+
+    cv::Mat outImg;
+    cv::drawMatches(objects[O1], objectsKeypoints[O1], objects[O2], objectsKeypoints[O2],
+                    matchesToDraw, outImg, cv::Scalar(255, 0, 0));
+
+    cv::imshow("outImg", outImg);
+    cv::waitKey();
+//    std::cout << "object 0 and 2: matches: " << matches.size() << "\n";
+//    cv::drawMatches(objec)
 
     return 0;
 }
