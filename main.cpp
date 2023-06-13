@@ -317,13 +317,17 @@ void normalizeAreasCharacteristics(const std::vector<std::vector<double>>& chara
     }
 }
 
-void classifyAreas(const std::vector<std::vector<double>>& characteristics,
-                   const std::vector<Area>& areas,
-                   std::vector<std::vector<Area>>& clusters)
-{
-    clusters.clear();
+//void classifyAreas(const std::vector<std::vector<double>>& characteristics,
+//                   const std::vector<Area>& areas,
+//                   std::vector<std::vector<Area>>& clusters)
+//{
+//    clusters.clear();
+//}
 
-}
+struct Pixel
+{
+    char r, g, b;
+};
 
 int main()
 {
@@ -345,25 +349,47 @@ int main()
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-    std::cout << contours.size() << "\n"; // 5 contours found.
+//    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
 
-    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
-//    cv::imshow("window", img);
-//    cv::waitKey();
+    std::vector<cv::Mat> objects;
+    for (const auto& cont : contours)
+    {
+        cv::Rect bounds = cv::boundingRect(cont);
+        cv::Mat newObj = cv::Mat::zeros(bounds.height, bounds.width, img.type());
 
-//    for (int i = 0; i < contours.size(); i++)
-//    {
-//        const double perimeter = cv::arcLength(contours[i], true);
-//        std::cout << perimeter << "\n";
-//
-//        std::vector<cv::Point> approxCurve;
-//        cv::approxPolyDP(contours[i], approxCurve, 0.02 * perimeter, true);
-//        std::cout << "approxPolyDP\n";
-//
-//        std::cout << approxCurve.size() << "\n";
-//
-//        cv::drawContours(img, {approxCurve}, 0, cv::Scalar(0, 0, 255), 4);
-//    }
+        std::cout << img.type() << "\n";
+
+        if (bounds.width < 30 && bounds.height < 30) { continue; }
+
+        for (int x = 0; x < bounds.width; x++)
+        {
+            for (int y = 0; y < bounds.height; y++)
+            {
+                // check if this point is inside the contour
+                double result = cv::pointPolygonTest(cont,
+                                                     {static_cast<float>(bounds.x + x),
+                                                      static_cast<float>(bounds.y + y)},
+                                                      false);
+                if (result >= 0) // inside or on the contour
+                {
+                    newObj.at<Pixel>(y, x) = img.at<Pixel>(y + bounds.y, x + bounds.x);
+                }
+                else
+                {
+                    // outside
+//                    newObj.at<cv::Scalar>(y, x) = cv::Scalar(255, 255, 255);
+                }
+            }
+        }
+
+        cv::imshow("newObj", newObj);
+        cv::waitKey();
+
+        objects.push_back(newObj);
+    }
+
+    std::cout << "total objects: " << objects.size() << "\n";
+
     cv::imshow("window", img);
     cv::waitKey();
 
