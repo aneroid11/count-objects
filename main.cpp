@@ -327,52 +327,59 @@ void classifyAreas(const std::vector<std::vector<double>>& characteristics,
 
 int main()
 {
-    cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test3.jpg");
-    cv::Mat grayImg;
-    cv::cvtColor(img, grayImg, cv::COLOR_BGR2GRAY);
+    cv::Mat img = cv::imread("../test3.jpg");
+    cv::Mat edged;
+    cv::Canny(img, edged, 10, 250);
 
-    cv::Mat blurredImg;
-    cv::GaussianBlur(grayImg, blurredImg, cv::Size(5, 5), 0);
-
-    cv::imshow("window", blurredImg);
+    cv::imshow("window", edged);
     cv::waitKey();
 
-    cv::Mat binaryImg;
-    cv::threshold(blurredImg, binaryImg, 0, 255,
-                  cv::THRESH_BINARY_INV + cv::THRESH_OTSU);
-
-    std::vector<Area> areas;
-    findAreasInBinaryImg(binaryImg, areas);
-
-    std::vector<std::vector<double>> areasCharacteristics;
-    computeAreasCharacteristics(areas, areasCharacteristics);
-
-    std::vector<std::vector<double>> normCharacteristics;
-    normalizeAreasCharacteristics(areasCharacteristics, normCharacteristics);
-
-    for (int i = 0; i < areasCharacteristics.size(); i++)
-    {
-        const auto& currChars = normCharacteristics[i];
-
-        std::cout << "object " << i << "\n";
-        for (double ch : currChars)
-        {
-            std::cout << ch << " ";
-        }
-        std::cout << "\n";
-    }
-
-    std::cout << "areas found: " << areas.size() << "\n";
-    std::cout << "areas info: \n\n";
-    for (const Area& a : areas)
-    {
-        std::cout << "area:\n";
-        std::cout << "left top: " << a.leftTop().x << ", " << a.leftTop().y << "\n";
-        std::cout << "width, height: " << a.width() << ", " << a.height() << "\n\n";
-    }
-
-    cv::imshow("window", binaryImg);
-    cv::waitKey();
+//    cv::Mat img = cv::imread("/home/lucky/dev/6sem/practice/count-objects/test3.jpg");
+//    cv::Mat grayImg;
+//    cv::cvtColor(img, grayImg, cv::COLOR_BGR2GRAY);
+//
+//    cv::Mat blurredImg;
+//    cv::GaussianBlur(grayImg, blurredImg, cv::Size(5, 5), 0);
+//
+//    cv::imshow("window", blurredImg);
+//    cv::waitKey();
+//
+//    cv::Mat binaryImg;
+//    cv::threshold(blurredImg, binaryImg, 0, 255,
+//                  cv::THRESH_BINARY_INV + cv::THRESH_OTSU);
+//
+//    std::vector<Area> areas;
+//    findAreasInBinaryImg(binaryImg, areas);
+//
+//    std::vector<std::vector<double>> areasCharacteristics;
+//    computeAreasCharacteristics(areas, areasCharacteristics);
+//
+//    std::vector<std::vector<double>> normCharacteristics;
+//    normalizeAreasCharacteristics(areasCharacteristics, normCharacteristics);
+//
+//    for (int i = 0; i < areasCharacteristics.size(); i++)
+//    {
+//        const auto& currChars = normCharacteristics[i];
+//
+//        std::cout << "object " << i << "\n";
+//        for (double ch : currChars)
+//        {
+//            std::cout << ch << " ";
+//        }
+//        std::cout << "\n";
+//    }
+//
+//    std::cout << "areas found: " << areas.size() << "\n";
+//    std::cout << "areas info: \n\n";
+//    for (const Area& a : areas)
+//    {
+//        std::cout << "area:\n";
+//        std::cout << "left top: " << a.leftTop().x << ", " << a.leftTop().y << "\n";
+//        std::cout << "width, height: " << a.width() << ", " << a.height() << "\n\n";
+//    }
+//
+//    cv::imshow("window", binaryImg);
+//    cv::waitKey();
 
     return 0;
 }
