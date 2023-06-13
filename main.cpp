@@ -284,12 +284,37 @@ void computeAreasCharacteristics(const std::vector<Area>& areas, std::vector<std
 }
 
 void normalizeAreasCharacteristics(const std::vector<std::vector<double>>& characteristics,
-                                   std::vector<double>& normalized)
+                                   std::vector<std::vector<double>>& normalized)
 {
-    const int numChars = characteristics[0].size();
-    std::vector<double> maxChars = characteristics[0];
+    normalized.clear();
 
-    for (int i = 0; i < characteristics.size(); i++) {}
+    const int numChars = characteristics[0].size();
+    std::vector<double> maxChars;
+
+    for (int i = 0; i < numChars; i++)
+    {
+        double max = characteristics[0][i];
+
+        for (int j = 1; j < characteristics.size(); j++)
+        {
+            if (characteristics[j][i] > max)
+            {
+                max = characteristics[j][i];
+            }
+        }
+
+        maxChars.push_back(max);
+    }
+
+    for (int i = 0; i < characteristics.size(); i++)
+    {
+        std::vector<double> currNormalized;
+        for (int j = 0; j < numChars; j++)
+        {
+            currNormalized.push_back(characteristics[i][j] / maxChars[j]);
+        }
+        normalized.push_back(currNormalized);
+    }
 }
 
 int main()
@@ -311,11 +336,12 @@ int main()
     std::vector<std::vector<double>> areasCharacteristics;
     computeAreasCharacteristics(areas, areasCharacteristics);
 
-    std::cout << areasCharacteristics.size() << "\n";
+    std::vector<std::vector<double>> normCharacteristics;
+    normalizeAreasCharacteristics(areasCharacteristics, normCharacteristics);
 
     for (int i = 0; i < areasCharacteristics.size(); i++)
     {
-        const auto& currChars = areasCharacteristics[i];
+        const auto& currChars = normCharacteristics[i];
 
         std::cout << "object " << i << "\n";
         for (double ch : currChars)
@@ -324,9 +350,6 @@ int main()
         }
         std::cout << "\n";
     }
-
-//    std::vector<std::vector<double>> normCharacteristics;
-//    normalizeAreasCharacteristics(areasCharacteristics, normCharacteristics);
 
     std::cout << "areas found: " << areas.size() << "\n";
     std::cout << "areas info: \n\n";
