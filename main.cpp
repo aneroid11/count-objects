@@ -18,9 +18,15 @@ int main()
     //cv::Mat imgGray
     cv::cvtColor(img, img, cv::COLOR_BGR2GRAY);
 
-    cv::imshow("imgGray", img);
+//    cv::imshow("img", img);
+//    cv::waitKey();
+
+    cv::Mat binaryImg;
+    cv::threshold(img, binaryImg, 120, 255, cv::THRESH_BINARY);
+
+    cv::imshow("img", binaryImg);
     cv::waitKey();
-    
+
     exit(0);
 
     cv::Mat edged;
