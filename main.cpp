@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -13,13 +14,20 @@ struct Pixel
 
 int main()
 {
-    cv::Mat img = cv::imread("../test3.jpg", cv::IMREAD_GRAYSCALE);
-//    cv::Mat img = cv::imread("../test4.png");
+    cv::Mat img = cv::imread("../test3.jpg");
+    //cv::Mat imgGray
+    cv::cvtColor(img, img, cv::COLOR_BGR2GRAY);
+
+    cv::imshow("imgGray", img);
+    cv::waitKey();
+    
+    exit(0);
+
     cv::Mat edged;
     cv::Canny(img, edged, 10, 250);
 
-//    cv::imshow("window", edged);
-//    cv::waitKey();
+    cv::imshow("window", edged);
+    cv::waitKey();
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
     cv::Mat closed;
@@ -31,7 +39,10 @@ int main()
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-//    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
+    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
+    cv::imshow("img", img);
+    cv::waitKey();
+//    exit(0);
 
     cv::Ptr<cv::ORB> orbDetector = cv::ORB::create();
 
@@ -108,20 +119,34 @@ int main()
         objectsDescriptors.push_back(descriptors);
     }
 
+    std::vector<cv::KeyPoint> imgKeypoints;
+    cv::Mat imgDescriptors;
+    orbDetector->detectAndCompute(img, cv::noArray(), imgKeypoints, imgDescriptors);
+
     cv::BFMatcher bfmatcher(cv::NORM_HAMMING, true);
 
     std::vector<cv::DMatch> matches;
-    const int O1 = 1;
-    const int O2 = 4;
+    const int O1 = 2;
+    const int O2 = 1;
     bfmatcher.match(objectsDescriptors[O1], objectsDescriptors[O2], matches);
+//    bfmatcher.match(objectsDescriptors[O1], imgDescriptors, matches);
 
-    std::vector<cv::DMatch> matchesToDraw = matches;
-//    for (int i = 0; i < 20; i++)
-//    {
-//        matchesToDraw.push_back(matches[i]);
-//    }
+    std::cout << matches.size() << "\n";
+
+    std::sort(matches.begin(),
+              matches.end(),
+              [](const cv::DMatch& m1, const cv::DMatch& m2){ return m1.distance < m2.distance; });
+
+//    std::vector<cv::DMatch> matchesToDraw = matches;
+    std::vector<cv::DMatch> matchesToDraw;
+    for (int i = 0; i < 500 && i < matches.size(); i++)
+    {
+        matchesToDraw.push_back(matches[i]);
+    }
 
     cv::Mat outImg;
+//    cv::drawMatches(objects[O1], objectsKeypoints[O1], img, imgKeypoints,
+//                    matchesToDraw, outImg, cv::Scalar(255, 0, 0));
     cv::drawMatches(objects[O1], objectsKeypoints[O1], objects[O2], objectsKeypoints[O2],
                     matchesToDraw, outImg, cv::Scalar(255, 0, 0));
 
