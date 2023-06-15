@@ -21,12 +21,12 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
 
     cv::Mat contrasted;
     cv::convertScaleAbs(img, contrasted, 1.3, 0);
-    showImg(contrasted);
+//    showImg(contrasted);
 
     cv::Mat edged;
 //    cv::Canny(img, edged, 100, 255);
     cv::Canny(contrasted, edged, 85, 255);
-    showImg(edged);
+//    showImg(edged);
 
 //    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, {9, 9});
 //    cv::Mat dilated;
@@ -38,8 +38,7 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
     cv::Mat closed;
     cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
-//    showImg(kernel);
-    showImg(closed);
+//    showImg(closed);
 
     std::vector<std::vector<cv::Point>> allContours;
     cv::findContours(closed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
@@ -48,16 +47,12 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
     {
         cv::Rect bounds = cv::boundingRect(cont);
 
-        if (bounds.width < 30 && bounds.height < 30)
+        if (bounds.width < 60 && bounds.height < 60)
         {
             continue;
         }
         contours.push_back(cont);
     }
-//    cv::findContours(dilated, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-//
-//    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
-//    showImg(img);
 }
 
 void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours,
@@ -281,7 +276,7 @@ void drawClassification(cv::Mat& img,
 
 int main()
 {
-    cv::Mat img = cv::imread("../test5m.jpg");
+    cv::Mat img = cv::imread("../test4m.jpg");
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
     std::vector<std::vector<cv::Point>> contours;
@@ -290,7 +285,7 @@ int main()
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
 
-    showObjects(objects);
+//    showObjects(objects);
 
     rotateObjects(objects, contours);
 
