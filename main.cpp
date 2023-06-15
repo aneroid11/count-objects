@@ -97,11 +97,20 @@ void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, const double angle)
     const cv::Rect bbox = cv::RotatedRect(cv::Point(),
                                           srcImg.size(),
                                           static_cast<float>(-angle)).boundingRect();
-    // shift the center
+    // shift the center of rotation
     rotM.at<double>(0,2) += bbox.width/2.0 - srcImg.cols/2.0;
     rotM.at<double>(1,2) += bbox.height/2.0 - srcImg.rows/2.0;
 
     cv::warpAffine(srcImg, dstImg, rotM, cv::Size(bbox.width, bbox.height));
+}
+
+void rotateObjects(std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours)
+{
+    for (int i = 0; i < objects.size(); i++)
+    {
+        const double angle = getOrientationAngle(contours[i]);
+        rotateImg(objects[i], objects[i], angle);
+    }
 }
 
 int main()
@@ -114,16 +123,9 @@ int main()
 
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
-//    showObjects(objects);
+    rotateObjects(objects, contours);
 
-    for (int i = 0; i < objects.size(); i++)
-    {
-        const double angle = getOrientationAngle(contours[i]);
-        // rotate back
-        cv::Mat rotated;
-        rotateImg(objects[i], rotated, angle);
-        showImg(rotated);
-    }
+    showObjects(objects);
 
     return 0;
 }
