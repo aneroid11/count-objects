@@ -21,13 +21,13 @@ void showImg(const cv::Mat& img)
 void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& contours)
 {
     cv::Mat edged;
-    cv::Canny(img, edged, 100, 250);
+    cv::Canny(img, edged, 100, 255);
     showImg(edged);
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
     cv::Mat closed;
     cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
-    showImg(kernel);
+//    showImg(kernel);
     showImg(closed);
 
     cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
