@@ -17,26 +17,40 @@ void showImg(const cv::Mat& img)
 
 void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& contours)
 {
+    contours.clear();
+
     cv::Mat edged;
 //    cv::Canny(img, edged, 100, 255);
     cv::Canny(img, edged, 85, 255);
     showImg(edged);
 
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, {9, 9});
-    cv::Mat dilated;
-    cv::dilate(edged, dilated, kernel);
+//    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, {9, 9});
+//    cv::Mat dilated;
+//    cv::dilate(edged, dilated, kernel);
+//
+//    showImg(dilated);
+//    exit(0);
 
-    showImg(dilated);
-    //exit(0);
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
+    cv::Mat closed;
+    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
+//    showImg(kernel);
+    showImg(closed);
 
-//    kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
-//    cv::Mat closed;
-//    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
-////    showImg(kernel);
-//    showImg(closed);
+    std::vector<std::vector<cv::Point>> allContours;
+    cv::findContours(closed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-    //cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-    cv::findContours(dilated, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    for (const auto& cont : allContours)
+    {
+        cv::Rect bounds = cv::boundingRect(cont);
+
+        if (bounds.width < 30 && bounds.height < 30)
+        {
+            continue;
+        }
+        contours.push_back(cont);
+    }
+//    cv::findContours(dilated, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 //
 //    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
 //    showImg(img);
@@ -263,7 +277,7 @@ void drawClassification(cv::Mat& img,
 
 int main()
 {
-    cv::Mat img = cv::imread("../test3.jpg");
+    cv::Mat img = cv::imread("../test4m.jpg");
 //    cv::Mat img = cv::imread("../test4.jpg");
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
