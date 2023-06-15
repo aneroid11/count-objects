@@ -113,6 +113,16 @@ void rotateObjects(std::vector<cv::Mat>& objects, const std::vector<std::vector<
     }
 }
 
+void compareObjects(const std::vector<cv::Mat>& objects, const int o1, const int o2)
+{
+    cv::Mat result;
+    cv::matchTemplate(objects[o1], objects[o2], result, cv::TM_CCOEFF_NORMED);
+
+    double maxVal;
+    cv::minMaxLoc(result, nullptr, &maxVal);
+    std::cout << "max val: " << maxVal << "\n";
+}
+
 int main()
 {
     cv::Mat img = cv::imread("../test3.jpg");
@@ -126,6 +136,9 @@ int main()
     rotateObjects(objects, contours);
 
     showObjects(objects);
+
+    // compare images 0 and 2
+    compareObjects(objects, 2, 4);
 
     return 0;
 }
