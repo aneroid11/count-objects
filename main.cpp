@@ -19,9 +19,13 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
 {
     contours.clear();
 
+    cv::Mat contrasted;
+    cv::convertScaleAbs(img, contrasted, 1.3, 0);
+    showImg(contrasted);
+
     cv::Mat edged;
 //    cv::Canny(img, edged, 100, 255);
-    cv::Canny(img, edged, 85, 255);
+    cv::Canny(contrasted, edged, 85, 255);
     showImg(edged);
 
 //    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, {9, 9});
@@ -277,8 +281,7 @@ void drawClassification(cv::Mat& img,
 
 int main()
 {
-    cv::Mat img = cv::imread("../test4m.jpg");
-//    cv::Mat img = cv::imread("../test4.jpg");
+    cv::Mat img = cv::imread("../test5m.jpg");
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
     std::vector<std::vector<cv::Point>> contours;
