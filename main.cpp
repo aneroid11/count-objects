@@ -19,16 +19,24 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
 {
     cv::Mat edged;
 //    cv::Canny(img, edged, 100, 255);
-    cv::Canny(img, edged, 10, 250);
+    cv::Canny(img, edged, 85, 255);
     showImg(edged);
 
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
-    cv::Mat closed;
-    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
-//    showImg(kernel);
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, {9, 9});
+    cv::Mat dilated;
+    cv::dilate(edged, dilated, kernel);
+
+    showImg(dilated);
+    //exit(0);
+
+//    kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
+//    cv::Mat closed;
+//    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
+////    showImg(kernel);
 //    showImg(closed);
 
-    cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    //cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    cv::findContours(dilated, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 //
 //    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
 //    showImg(img);
@@ -182,8 +190,6 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
         double maxVal;
         cv::minMaxLoc(result, nullptr, &maxVal);
 
-//        std::cout << maxVal << "\n";
-
         if (maxVal > OBJECTS_ARE_SAME_THRESHOLD)
         {
             return true;
@@ -257,8 +263,8 @@ void drawClassification(cv::Mat& img,
 
 int main()
 {
-//    cv::Mat img = cv::imread("../test3.jpg");
-    cv::Mat img = cv::imread("../test4.jpg");
+    cv::Mat img = cv::imread("../test3.jpg");
+//    cv::Mat img = cv::imread("../test4.jpg");
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
     std::vector<std::vector<cv::Point>> contours;
