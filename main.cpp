@@ -21,12 +21,11 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
 
     cv::Mat contrasted;
     cv::convertScaleAbs(img, contrasted, 1.3, 0);
-//    showImg(contrasted);
+    showImg(contrasted);
 
     cv::Mat edged;
-//    cv::Canny(img, edged, 100, 255);
     cv::Canny(contrasted, edged, 85, 255);
-//    showImg(edged);
+    showImg(edged);
 
 //    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, {9, 9});
 //    cv::Mat dilated;
@@ -38,7 +37,7 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
     cv::Mat closed;
     cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
-//    showImg(closed);
+    showImg(closed);
 
     std::vector<std::vector<cv::Point>> allContours;
     cv::findContours(closed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
@@ -62,8 +61,6 @@ void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>
     {
         cv::Rect bounds = cv::boundingRect(cont);
         cv::Mat newObj = cv::Mat::zeros(bounds.height, bounds.width, img.type());
-
-        if (bounds.width < 30 && bounds.height < 30) { continue; }
 
         for (int x = 0; x < bounds.width; x++)
         {
