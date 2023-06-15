@@ -16,13 +16,13 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
 {
     cv::Mat edged;
     cv::Canny(img, edged, 100, 255);
-    showImg(edged);
+//    showImg(edged);
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
     cv::Mat closed;
     cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
 //    showImg(kernel);
-    showImg(closed);
+//    showImg(closed);
 
     cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 //
@@ -55,7 +55,7 @@ void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>
                 }
                 else
                 {
-                    newObj.at<cv::Vec4b>(y, x) = cv::Vec4b(255, 255, 255, 0);
+                    newObj.at<cv::Vec4b>(y, x) = cv::Vec4b(0, 0, 0, 0);
                 }
             }
         }
@@ -93,7 +93,15 @@ void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, const double angle)
     std::cout << angle << "\n";
     cv::Mat rotM = cv::getRotationMatrix2D(center, angle, 1.0);
 //    cv::warpAffine(srcImg, dstImg, rotM, cv::Size(width * 2, height * 2));
-    cv::warpAffine(srcImg, dstImg, rotM, cv::Size(500, 500));
+
+    const cv::Rect bbox = cv::RotatedRect(cv::Point(),
+                                          srcImg.size(),
+                                          static_cast<float>(-angle)).boundingRect();
+    // shift the center
+    rotM.at<double>(0,2) += bbox.width/2.0 - srcImg.cols/2.0;
+    rotM.at<double>(1,2) += bbox.height/2.0 - srcImg.rows/2.0;
+
+    cv::warpAffine(srcImg, dstImg, rotM, cv::Size(bbox.width, bbox.height));
 }
 
 int main()
@@ -106,7 +114,7 @@ int main()
 
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
-    showObjects(objects);
+//    showObjects(objects);
 
     for (int i = 0; i < objects.size(); i++)
     {
