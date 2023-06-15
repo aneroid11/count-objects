@@ -84,6 +84,18 @@ double getOrientationAngle(const std::vector<cv::Point>& contour)
     return rect.angle;
 }
 
+void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, const double angle)
+{
+    const int width = srcImg.cols;
+    const int height = srcImg.rows;
+    const cv::Point center = cv::Point(width / 2, height / 2);
+
+    std::cout << angle << "\n";
+    cv::Mat rotM = cv::getRotationMatrix2D(center, angle, 1.0);
+//    cv::warpAffine(srcImg, dstImg, rotM, cv::Size(width * 2, height * 2));
+    cv::warpAffine(srcImg, dstImg, rotM, cv::Size(500, 500));
+}
+
 int main()
 {
     cv::Mat img = cv::imread("../test3.jpg");
@@ -96,9 +108,13 @@ int main()
     extractObjects(img, contours, objects);
     showObjects(objects);
 
-    for (const auto& cont : contours)
+    for (int i = 0; i < objects.size(); i++)
     {
-        std::cout << getOrientationAngle(cont) << "\n";
+        const double angle = getOrientationAngle(contours[i]);
+        // rotate back
+        cv::Mat rotated;
+        rotateImg(objects[i], rotated, angle);
+        showImg(rotated);
     }
 
     return 0;
