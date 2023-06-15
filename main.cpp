@@ -62,12 +62,6 @@ void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>
             }
         }
 
-//        // we need a larger image to find more key points
-//        cv::copyMakeBorder(newObj, newObj,
-//                           100, 100, 100, 100,
-//                           cv::BORDER_CONSTANT,
-//                           cv::Scalar(255, 255, 255));
-
         objects.push_back(newObj);
     }
 }
@@ -114,10 +108,10 @@ void rotateObjects(std::vector<cv::Mat>& objects, const std::vector<std::vector<
     }
 }
 
-void compareObjects(const std::vector<cv::Mat>& objects, const int o1, const int o2)
+void correctSizesForComparing(const cv::Mat& img1, const cv::Mat& img2, cv::Mat& obj1, cv::Mat& obj2)
 {
-    cv::Mat obj1 = objects[o1];
-    cv::Mat obj2 = objects[o2];
+    obj1 = img1;
+    obj2 = img2;
 
     const int w1 = obj1.cols;
     const int w2 = obj2.cols;
@@ -145,14 +139,59 @@ void compareObjects(const std::vector<cv::Mat>& objects, const int o1, const int
                                BG_COLOR);
         }
     }
+}
 
-    cv::Mat result;
-    cv::matchTemplate(obj1, obj2, result, cv::TM_CCOEFF_NORMED);
-    showImg(result);
+void getObjVariants(const cv::Mat& obj, std::vector<cv::Mat>& variants)
+{
+    variants.clear();
+    variants.push_back(obj);
 
-    double maxVal;
-    cv::minMaxLoc(result, nullptr, &maxVal);
-    std::cout << "max val: " << maxVal << "\n";
+    cv::Mat hflipped;
+    cv::flip(obj, hflipped, 1);
+
+    cv::Mat vflipped;
+    cv::flip(obj, vflipped, 0);
+
+    cv::Mat hvflipped;
+    cv::flip(obj, hvflipped, -1);
+
+    variants.push_back(hvflipped);
+    variants.push_back(vflipped);
+    variants.push_back(hflipped);
+}
+
+void compareObjects(const std::vector<cv::Mat>& objects, const int o1, const int o2)
+{
+    cv::Mat obj1;
+    cv::Mat obj2;
+    correctSizesForComparing(objects[o1], objects[o2], obj1, obj2);
+
+    std::vector<cv::Mat> obj1Variants;
+    getObjVariants(obj1, obj1Variants);
+
+    showImg(obj1);
+    showImg(obj2);
+
+//    std::vector<double> maxVals;
+
+    for (const cv::Mat& v : obj1Variants)
+    {
+        cv::Mat result;
+        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
+        //    showImg(result);
+        double maxVal;
+        cv::minMaxLoc(result, nullptr, &maxVal);
+
+        std::cout << maxVal << "\n";
+
+        if (maxVal > 0.75)
+        {
+            std::cout << "objects are the same";
+            return;
+        }
+    }
+
+    std::cout << "objects are not the same";
 }
 
 int main()
@@ -167,7 +206,7 @@ int main()
     extractObjects(img, contours, objects);
     rotateObjects(objects, contours);
 
-    showObjects(objects);
+//    showObjects(objects);
 
     compareObjects(objects, 1, 3);
 
