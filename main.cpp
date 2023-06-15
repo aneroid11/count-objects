@@ -78,6 +78,12 @@ void showObjects(const std::vector<cv::Mat>& objects)
     }
 }
 
+double getOrientationAngle(const std::vector<cv::Point>& contour)
+{
+    cv::RotatedRect rect = cv::fitEllipse(contour);
+    return rect.angle;
+}
+
 int main()
 {
     cv::Mat img = cv::imread("../test3.jpg");
@@ -89,6 +95,11 @@ int main()
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
     showObjects(objects);
+
+    for (const auto& cont : contours)
+    {
+        std::cout << getOrientationAngle(cont) << "\n";
+    }
 
     return 0;
 }
