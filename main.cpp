@@ -7,6 +7,7 @@
 #include <opencv2/imgproc.hpp>
 
 const cv::Vec4b BG_COLOR = cv::Vec4b(0, 0, 0, 0);
+const double OBJECTS_ARE_SAME_THRESHOLD = 0.75;
 
 void showImg(const cv::Mat& img)
 {
@@ -160,19 +161,17 @@ void getObjVariants(const cv::Mat& obj, std::vector<cv::Mat>& variants)
     variants.push_back(hflipped);
 }
 
-void compareObjects(const std::vector<cv::Mat>& objects, const int o1, const int o2)
+bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
 {
     cv::Mat obj1;
     cv::Mat obj2;
-    correctSizesForComparing(objects[o1], objects[o2], obj1, obj2);
+    correctSizesForComparing(o1, o2, obj1, obj2);
 
     std::vector<cv::Mat> obj1Variants;
     getObjVariants(obj1, obj1Variants);
 
-    showImg(obj1);
-    showImg(obj2);
-
-//    std::vector<double> maxVals;
+//    showImg(obj1);
+//    showImg(obj2);
 
     for (const cv::Mat& v : obj1Variants)
     {
@@ -182,16 +181,62 @@ void compareObjects(const std::vector<cv::Mat>& objects, const int o1, const int
         double maxVal;
         cv::minMaxLoc(result, nullptr, &maxVal);
 
-        std::cout << maxVal << "\n";
+//        std::cout << maxVal << "\n";
 
-        if (maxVal > 0.75)
+        if (maxVal > OBJECTS_ARE_SAME_THRESHOLD)
         {
-            std::cout << "objects are the same\n";
-            //return;
+            return true;
         }
     }
 
-    //std::cout << "objects are not the same";
+    return false;
+}
+
+void classifyObjects(const std::vector<cv::Mat>& objects, std::vector<std::vector<int>>& classes)
+{
+    classes.clear();
+
+    std::vector<int> objInds;
+    for (int i = 0; i < objects.size(); i++) { objInds.push_back(i); }
+
+    while (true)
+    {
+        if (objInds.empty())
+        {
+            return;
+        }
+        if (objInds.size() < 2)
+        {
+            classes.push_back(objInds);
+            return;
+        }
+
+        std::vector<int> currClass;
+        const int first = objInds[0];
+
+        auto position = std::find(objInds.begin(), objInds.end(), first);
+        objInds.erase(position);
+
+        currClass.push_back(first);
+
+        int i = 0;
+        while (i < objInds.size())
+        {
+            const int pairInd = objInds[i];
+
+            if (compareObjects(objects[first], objects[pairInd]))
+            {
+                position = std::find(objInds.begin(), objInds.end(), pairInd);
+                objInds.erase(position);
+
+                currClass.push_back(pairInd);
+                continue;
+            }
+            i++;
+        }
+
+        classes.push_back(currClass);
+    }
 }
 
 int main()
@@ -208,7 +253,20 @@ int main()
 
 //    showObjects(objects);
 
-    compareObjects(objects, 0, 4);
+//    compareObjects(objects[0], objects[4]);
+    std::vector<std::vector<int>> objClasses;
+    classifyObjects(objects, objClasses);
+
+    for (const auto& cl : objClasses)
+    {
+        std::cout << "class: ";
+
+        for (const auto& ind : cl)
+        {
+            std::cout << ind << " ";
+        }
+        std::cout << "\n";
+    }
 
     return 0;
 }
