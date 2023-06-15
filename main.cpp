@@ -7,28 +7,57 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/features2d.hpp>
 
-struct Pixel
+//struct Pixel
+//{
+//    char r, g, b;
+//};
+
+void showImg(const cv::Mat& img)
 {
-    char r, g, b;
-};
+    cv::imshow("", img);
+    cv::waitKey();
+}
+
+void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& contours)
+{
+    cv::Mat edged;
+    cv::Canny(img, edged, 100, 250);
+    showImg(edged);
+
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
+    cv::Mat closed;
+    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
+    showImg(kernel);
+    showImg(closed);
+
+    cv::findContours(closed, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 4);
+    showImg(img);
+}
 
 int main()
 {
     cv::Mat img = cv::imread("../test3.jpg");
-    //cv::Mat imgGray
-    cv::cvtColor(img, img, cv::COLOR_BGR2GRAY);
 
-//    cv::imshow("img", img);
-//    cv::waitKey();
+    std::vector<std::vector<cv::Point>> contours;
+    findContoursOnImg(img, contours);
 
-    cv::Mat binaryImg;
-    cv::threshold(img, binaryImg, 120, 255, cv::THRESH_BINARY);
-
-    cv::imshow("img", binaryImg);
-    cv::waitKey();
-
-    exit(0);
-
+//    cv::Mat imgGray;
+//    cv::cvtColor(img, imgGray, cv::COLOR_BGR2GRAY);
+//
+//    cv::Mat binaryImg;
+//    cv::threshold(imgGray, binaryImg, 120, 255, cv::THRESH_BINARY_INV);
+//    showImg(binaryImg);
+//
+//    // closing
+//    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7, 7));
+//    cv::Mat closedImg;
+//    cv::morphologyEx(binaryImg, closedImg, cv::MORPH_CLOSE, kernel);
+//    showImg(closedImg);
+//
+//    exit(0);
+/*
     cv::Mat edged;
     cv::Canny(img, edged, 10, 250);
 
@@ -160,6 +189,6 @@ int main()
     cv::waitKey();
 //    std::cout << "object 0 and 2: matches: " << matches.size() << "\n";
 //    cv::drawMatches(objec)
-
+*/
     return 0;
 }
