@@ -239,6 +239,21 @@ void classifyObjects(const std::vector<cv::Mat>& objects, std::vector<std::vecto
     }
 }
 
+void drawClassification(cv::Mat& img,
+                        const std::vector<std::vector<cv::Point>>& contours,
+                        const std::vector<std::vector<int>>& objClasses)
+{
+    for (const auto& currClass : objClasses)
+    {
+        const cv::Scalar color = cv::Scalar(rand() % 256, rand() % 256, rand() % 256);
+
+        for (const int objInd : currClass)
+        {
+            cv::drawContours(img, contours, objInd, color, 3);
+        }
+    }
+}
+
 int main()
 {
     cv::Mat img = cv::imread("../test3.jpg");
@@ -257,16 +272,8 @@ int main()
     std::vector<std::vector<int>> objClasses;
     classifyObjects(objects, objClasses);
 
-    for (const auto& cl : objClasses)
-    {
-        std::cout << "class: ";
-
-        for (const auto& ind : cl)
-        {
-            std::cout << ind << " ";
-        }
-        std::cout << "\n";
-    }
+    drawClassification(img, contours, objClasses);
+    showImg(img);
 
     return 0;
 }
