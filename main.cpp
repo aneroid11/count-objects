@@ -186,12 +186,12 @@ void compareObjects(const std::vector<cv::Mat>& objects, const int o1, const int
 
         if (maxVal > 0.75)
         {
-            std::cout << "objects are the same";
-            return;
+            std::cout << "objects are the same\n";
+            //return;
         }
     }
 
-    std::cout << "objects are not the same";
+    //std::cout << "objects are not the same";
 }
 
 int main()
@@ -208,7 +208,7 @@ int main()
 
 //    showObjects(objects);
 
-    compareObjects(objects, 1, 3);
+    compareObjects(objects, 0, 4);
 
     return 0;
 }
