@@ -21,11 +21,11 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
 
     cv::Mat contrasted;
     cv::convertScaleAbs(img, contrasted, 1.3, 0);
-    showImg(contrasted);
+//    showImg(contrasted);
 
     cv::Mat edged;
     cv::Canny(contrasted, edged, 85, 255);
-    showImg(edged);
+//    showImg(edged);
 
 //    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, {9, 9});
 //    cv::Mat dilated;
@@ -37,7 +37,7 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
     cv::Mat closed;
     cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
-    showImg(closed);
+//    showImg(closed);
 
     std::vector<std::vector<cv::Point>> allContours;
     cv::findContours(closed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
@@ -52,6 +52,8 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
         }
         contours.push_back(cont);
     }
+
+    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 3);
 }
 
 void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours,
@@ -271,9 +273,29 @@ void drawClassification(cv::Mat& img,
     }
 }
 
+void computeGeomParams(const std::vector<std::vector<cv::Point>>& contours)
+{
+    for (const auto& cont : contours)
+    {
+        const double area = cv::contourArea(cont);
+        const double perim = cv::arcLength(cont, true);
+        const double compact = perim * perim / area;
+
+        cv::Moments m = cv::moments(cont);
+        const double sqrt = cv::sqrt((m.m20 - m.m02) * (m.m20 - m.m02) + 4 * m.m11 * m.m11);
+        const double elong = (m.m20 + m.m02 + sqrt) / (m.m20 + m.m02 - sqrt);
+
+        std::cout << "object:\n";
+        std::cout << "area: " << area << "\n";
+        std::cout << "perimeter: " << perim << "\n";
+        std::cout << "compactness: " << compact << "\n";
+        std::cout << "elongation: " << elong << "\n";
+    }
+}
+
 int main()
 {
-    cv::Mat img = cv::imread("../test4m.jpg");
+    cv::Mat img = cv::imread("../test3m.jpg");
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
     std::vector<std::vector<cv::Point>> contours;
@@ -282,7 +304,10 @@ int main()
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
 
-//    showObjects(objects);
+    showObjects(objects);
+
+    computeGeomParams(contours);
+    exit(0);
 
     rotateObjects(objects, contours);
 
