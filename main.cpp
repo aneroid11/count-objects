@@ -293,7 +293,7 @@ void computeGeomParams(const std::vector<std::vector<cv::Point>>& contours)
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     cv::Mat img = cv::imread("../test3m.jpg");
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
@@ -304,14 +304,12 @@ int main()
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
 
-    showObjects(objects);
+//    showObjects(objects);
 
-    computeGeomParams(contours);
-    exit(0);
+//    computeGeomParams(contours);
+//    exit(0);
 
     rotateObjects(objects, contours);
-
-//    showObjects(objects);
 
 //    compareObjects(objects[0], objects[4]);
     std::vector<std::vector<int>> objClasses;
