@@ -6,6 +6,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
+const std::string INPUT_FILE = "../test2m.jpg";
 const cv::Vec4b BG_COLOR = cv::Vec4b(0, 0, 0, 0);
 const double OBJECTS_ARE_SAME_THRESHOLD = 0.75;
 
@@ -15,29 +16,28 @@ void showImg(const cv::Mat& img)
     cv::waitKey();
 }
 
-void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& contours)
+void findContoursBinary(const cv::Mat& img, std::vector<std::vector<cv::Point>>& contours)
 {
     contours.clear();
 
     cv::Mat contrasted;
     cv::convertScaleAbs(img, contrasted, 1.3, 0);
-//    showImg(contrasted);
+    showImg(contrasted);
 
-    cv::Mat edged;
-    cv::Canny(contrasted, edged, 85, 255);
-//    showImg(edged);
+    cv::Mat gray;
+    cv::cvtColor(contrasted, gray, cv::COLOR_BGR2GRAY);
+    showImg(gray);
 
-//    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, {9, 9});
-//    cv::Mat dilated;
-//    cv::dilate(edged, dilated, kernel);
-//
-//    showImg(dilated);
+    cv::Mat binary;
+    cv::threshold(gray, binary, 127, 255, cv::THRESH_BINARY_INV);
+    showImg(binary);
 //    exit(0);
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
     cv::Mat closed;
-    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
-//    showImg(closed);
+    cv::morphologyEx(binary, closed, cv::MORPH_CLOSE, kernel);
+    showImg(closed);
+//    exit(0);
 
     std::vector<std::vector<cv::Point>> allContours;
     cv::findContours(closed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
@@ -52,8 +52,38 @@ void findContoursOnImg(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
         }
         contours.push_back(cont);
     }
+}
 
-    cv::drawContours(img, contours, -1, cv::Scalar(255, 0, 0), 3);
+void findContoursCanny(const cv::Mat& img, std::vector<std::vector<cv::Point>>& contours)
+{
+    contours.clear();
+
+    cv::Mat contrasted;
+    cv::convertScaleAbs(img, contrasted, 1.3, 0);
+//    showImg(contrasted);
+
+    cv::Mat edged;
+    cv::Canny(contrasted, edged, 85, 255);
+    showImg(edged);
+
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
+    cv::Mat closed;
+    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
+    showImg(closed);
+
+    std::vector<std::vector<cv::Point>> allContours;
+    cv::findContours(closed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    for (const auto& cont : allContours)
+    {
+        cv::Rect bounds = cv::boundingRect(cont);
+
+        if (bounds.width < 60 && bounds.height < 60)
+        {
+            continue;
+        }
+        contours.push_back(cont);
+    }
 }
 
 void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours,
@@ -142,11 +172,9 @@ void correctSizesForComparing(const cv::Mat& img1, const cv::Mat& img2, cv::Mat&
 
     if (w1 < w2 && h1 > h2 || w1 > w2 && h1 < h2)
     {
-        const int area1 = w1 * h1;
-        const int area2 = w2 * h2;
         const int widthToAdd = abs(w1 - w2);
 
-        if (area1 < area2)
+        if (w1 < w2)
         {
             cv::copyMakeBorder(obj1, obj1,
                                0, 0, widthToAdd / 2, widthToAdd / 2,
@@ -295,19 +323,19 @@ void computeGeomParams(const std::vector<std::vector<cv::Point>>& contours)
 
 int main(int argc, char* argv[])
 {
-    cv::Mat img = cv::imread("../test3m.jpg");
+    cv::Mat img = cv::imread(INPUT_FILE);
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
     std::vector<std::vector<cv::Point>> contours;
-    findContoursOnImg(img, contours);
+//    findContoursBinary(img, contours);
+    findContoursCanny(img, contours);
 
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
 
-//    showObjects(objects);
+    showObjects(objects);
 
 //    computeGeomParams(contours);
-//    exit(0);
 
     rotateObjects(objects, contours);
 
