@@ -6,7 +6,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-const std::string INPUT_FILE = "../test2m.jpg";
+const std::string INPUT_FILE = "../../testimages/test4.jpg";
 const cv::Vec4b BG_COLOR = cv::Vec4b(0, 0, 0, 0);
 const double OBJECTS_ARE_SAME_THRESHOLD = 0.75;
 
