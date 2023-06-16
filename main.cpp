@@ -33,9 +33,11 @@ void findContoursBinary(const cv::Mat& img, std::vector<std::vector<cv::Point>>&
     showImg(binary);
 //    exit(0);
 
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
+    const int kernelW = img.cols / 100;
+    const int kernelH = img.rows / 100;
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {kernelW, kernelH});
     cv::Mat closed;
-    cv::morphologyEx(binary, closed, cv::MORPH_CLOSE, kernel);
+//    cv::morphologyEx(binary, closed, cv::MORPH_CLOSE, kernel);
     showImg(closed);
 //    exit(0);
 
@@ -60,19 +62,22 @@ void findContoursCanny(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
 
     cv::Mat contrasted;
     cv::convertScaleAbs(img, contrasted, 1.3, 0);
-//    showImg(contrasted);
+    showImg(contrasted);
 
     cv::Mat edged;
     cv::Canny(contrasted, edged, 85, 255);
     showImg(edged);
 
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {7, 7});
-    cv::Mat closed;
-    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
-    showImg(closed);
+    const int kernelW = img.cols / 120;
+    const int kernelH = img.rows / 120;
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {kernelW, kernelH});
+    cv::Mat morphed;
+//    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
+    cv::dilate(edged, morphed, kernel);
+    showImg(morphed);
 
     std::vector<std::vector<cv::Point>> allContours;
-    cv::findContours(closed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    cv::findContours(morphed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     for (const auto& cont : allContours)
     {
