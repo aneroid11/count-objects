@@ -26,12 +26,18 @@ void computeGeomParams(cv::Mat& img, const std::vector<std::vector<cv::Point>>& 
         const double aspectRatio = std::min(rw, rh) / std::max(rw, rh);
         const double extent = area / (rw * rh);
 
+        std::vector<cv::Point> convexHull;
+        cv::convexHull(cont, convexHull);
+        const double hullArea = cv::contourArea(convexHull);
+        const double solidity = area / hullArea;
+
         std::cout << "object:\n";
         std::cout << "area: " << area << "\n";
         std::cout << "perimeter: " << perim << "\n";
         std::cout << "compactness: " << compact << "\n";
         std::cout << "aspect ratio: " << aspectRatio << "\n";
         std::cout << "extent: " << extent << "\n";
+        std::cout << "solidity: " << solidity << "\n";
     }
 
     cv::imshow("", img);
