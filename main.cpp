@@ -2,7 +2,7 @@
 #include "classification.h"
 #include "utils.h"
 
-const std::string INPUT_FILE = "../../testimages/test4.jpg";
+const std::string INPUT_FILE = "../../testimages/test3m.jpg";
 
 void computeGeomParams(cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours)
 {
@@ -21,15 +21,17 @@ void computeGeomParams(cv::Mat& img, const std::vector<std::vector<cv::Point>>& 
             cv::line(img, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 255, 255), 2);
         }
 
-        const double aspectRatio =
-                std::min(rect.size.width, rect.size.height) /
-                std::max(rect.size.width, rect.size.height);
+        const double rw = rect.size.width;
+        const double rh = rect.size.height;
+        const double aspectRatio = std::min(rw, rh) / std::max(rw, rh);
+        const double extent = area / (rw * rh);
 
         std::cout << "object:\n";
         std::cout << "area: " << area << "\n";
         std::cout << "perimeter: " << perim << "\n";
         std::cout << "compactness: " << compact << "\n";
         std::cout << "aspect ratio: " << aspectRatio << "\n";
+        std::cout << "extent: " << extent << "\n";
     }
 
     cv::imshow("", img);
