@@ -36,8 +36,7 @@ void findContoursCanny(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
     }
 }
 
-void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours,
-                    std::vector<cv::Mat>& objects, const cv::Vec4b& bgColor)
+void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours, std::vector<cv::Mat>& objects)
 {
     for (const auto& cont : contours)
     {
@@ -59,7 +58,7 @@ void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>
                 }
                 else
                 {
-                    newObj.at<cv::Vec4b>(y, x) = bgColor;
+                    newObj.at<cv::Vec4b>(y, x) = BG_COLOR;
                 }
             }
         }
