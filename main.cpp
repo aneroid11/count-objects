@@ -14,7 +14,16 @@ void computeGeomParams(cv::Mat& img, const std::vector<std::vector<cv::Point>>& 
 
         const cv::RotatedRect rect = cv::minAreaRect(cont);
 
-        const double aspectRatio = rect.size.width / rect.size.height;
+        cv::Point2f vertices[4];
+        rect.points(vertices);
+        for (int i = 0; i < 4; i++)
+        {
+            cv::line(img, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 255, 255), 2);
+        }
+
+        const double aspectRatio =
+                std::min(rect.size.width, rect.size.height) /
+                std::max(rect.size.width, rect.size.height);
 
         std::cout << "object:\n";
         std::cout << "area: " << area << "\n";
@@ -22,6 +31,9 @@ void computeGeomParams(cv::Mat& img, const std::vector<std::vector<cv::Point>>& 
         std::cout << "compactness: " << compact << "\n";
         std::cout << "aspect ratio: " << aspectRatio << "\n";
     }
+
+    cv::imshow("", img);
+    cv::waitKey();
 }
 
 int main()
@@ -36,7 +48,7 @@ int main()
     extractObjects(img, contours, objects);
 //    showObjects(objects);
 
-    computeGeomParams(contours);
+    computeGeomParams(img, contours);
     exit(0);
 
     rotateObjects(objects, contours);
