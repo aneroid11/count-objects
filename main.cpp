@@ -1,160 +1,11 @@
-#include <iostream>
-#include <vector>
 #include <algorithm>
 
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
+#include "objectextraction.h"
+#include "utils.h"
 
 const std::string INPUT_FILE = "../../testimages/test4.jpg";
 const cv::Vec4b BG_COLOR = cv::Vec4b(0, 0, 0, 0);
 const double OBJECTS_ARE_SAME_THRESHOLD = 0.75;
-
-void showImg(const cv::Mat& img)
-{
-    cv::imshow("", img);
-    cv::waitKey();
-}
-
-void findContoursBinary(const cv::Mat& img, std::vector<std::vector<cv::Point>>& contours)
-{
-    contours.clear();
-
-    cv::Mat contrasted;
-    cv::convertScaleAbs(img, contrasted, 1.3, 0);
-    showImg(contrasted);
-
-    cv::Mat gray;
-    cv::cvtColor(contrasted, gray, cv::COLOR_BGR2GRAY);
-    showImg(gray);
-
-    cv::Mat binary;
-    cv::threshold(gray, binary, 127, 255, cv::THRESH_BINARY_INV);
-    showImg(binary);
-//    exit(0);
-
-    const int kernelW = img.cols / 100;
-    const int kernelH = img.rows / 100;
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {kernelW, kernelH});
-    cv::Mat closed;
-//    cv::morphologyEx(binary, closed, cv::MORPH_CLOSE, kernel);
-    showImg(closed);
-//    exit(0);
-
-    std::vector<std::vector<cv::Point>> allContours;
-    cv::findContours(closed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-    for (const auto& cont : allContours)
-    {
-        cv::Rect bounds = cv::boundingRect(cont);
-
-        if (bounds.width < 60 && bounds.height < 60)
-        {
-            continue;
-        }
-        contours.push_back(cont);
-    }
-}
-
-void findContoursCanny(const cv::Mat& img, std::vector<std::vector<cv::Point>>& contours)
-{
-    contours.clear();
-
-    cv::Mat contrasted;
-    cv::convertScaleAbs(img, contrasted, 1.3, 0);
-    showImg(contrasted);
-
-    cv::Mat edged;
-    cv::Canny(contrasted, edged, 85, 255);
-    showImg(edged);
-
-    const int kernelW = img.cols / 120;
-    const int kernelH = img.rows / 120;
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, {kernelW, kernelH});
-    cv::Mat morphed;
-//    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
-    cv::dilate(edged, morphed, kernel);
-    showImg(morphed);
-
-    std::vector<std::vector<cv::Point>> allContours;
-    cv::findContours(morphed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-    for (const auto& cont : allContours)
-    {
-        cv::Rect bounds = cv::boundingRect(cont);
-
-        if (bounds.width < 60 && bounds.height < 60)
-        {
-            continue;
-        }
-        contours.push_back(cont);
-    }
-}
-
-void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours,
-                    std::vector<cv::Mat>& objects)
-{
-    for (const auto& cont : contours)
-    {
-        cv::Rect bounds = cv::boundingRect(cont);
-        cv::Mat newObj = cv::Mat::zeros(bounds.height, bounds.width, img.type());
-
-        for (int x = 0; x < bounds.width; x++)
-        {
-            for (int y = 0; y < bounds.height; y++)
-            {
-                // check if this point is inside the contour
-                double dist = cv::pointPolygonTest(cont,
-                                                   {static_cast<float>(bounds.x + x),
-                                                    static_cast<float>(bounds.y + y)},
-                                                   false);
-                if (dist >= 0)
-                {
-                    newObj.at<cv::Vec4b>(y, x) = img.at<cv::Vec4b>(y + bounds.y, x + bounds.x);
-                }
-                else
-                {
-                    newObj.at<cv::Vec4b>(y, x) = BG_COLOR;
-                }
-            }
-        }
-
-        objects.push_back(newObj);
-    }
-}
-
-void showObjects(const std::vector<cv::Mat>& objects)
-{
-    for (const auto& obj : objects)
-    {
-        showImg(obj);
-    }
-}
-
-double getOrientationAngle(const std::vector<cv::Point>& contour)
-{
-    cv::RotatedRect rect = cv::fitEllipse(contour);
-    return rect.angle;
-}
-
-void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, const double angle)
-{
-    const int width = srcImg.cols;
-    const int height = srcImg.rows;
-    const cv::Point center = cv::Point(width / 2, height / 2);
-
-    std::cout << angle << "\n";
-    cv::Mat rotM = cv::getRotationMatrix2D(center, angle, 1.0);
-
-    const cv::Rect bbox = cv::RotatedRect(cv::Point(),
-                                          srcImg.size(),
-                                          static_cast<float>(-angle)).boundingRect();
-    // shift the center of rotation
-    rotM.at<double>(0,2) += bbox.width/2.0 - srcImg.cols/2.0;
-    rotM.at<double>(1,2) += bbox.height/2.0 - srcImg.rows/2.0;
-
-    cv::warpAffine(srcImg, dstImg, rotM, cv::Size(bbox.width, bbox.height));
-}
 
 void rotateObjects(std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours)
 {
@@ -332,11 +183,10 @@ int main(int argc, char* argv[])
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
     std::vector<std::vector<cv::Point>> contours;
-//    findContoursBinary(img, contours);
     findContoursCanny(img, contours);
 
     std::vector<cv::Mat> objects;
-    extractObjects(img, contours, objects);
+    extractObjects(img, contours, objects, BG_COLOR);
 
     showObjects(objects);
 
