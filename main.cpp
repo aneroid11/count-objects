@@ -4,7 +4,7 @@
 
 const std::string INPUT_FILE = "../../testimages/test4.jpg";
 
-void computeGeomParams(const std::vector<std::vector<cv::Point>>& contours)
+void computeGeomParams(cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours)
 {
     for (const auto& cont : contours)
     {
@@ -12,15 +12,15 @@ void computeGeomParams(const std::vector<std::vector<cv::Point>>& contours)
         const double perim = cv::arcLength(cont, true);
         const double compact = perim * perim / area;
 
-        cv::Moments m = cv::moments(cont);
-        const double sqrt = cv::sqrt((m.m20 - m.m02) * (m.m20 - m.m02) + 4 * m.m11 * m.m11);
-        const double elong = (m.m20 + m.m02 + sqrt) / (m.m20 + m.m02 - sqrt);
+        const cv::RotatedRect rect = cv::minAreaRect(cont);
+
+        const double aspectRatio = rect.size.width / rect.size.height;
 
         std::cout << "object:\n";
         std::cout << "area: " << area << "\n";
         std::cout << "perimeter: " << perim << "\n";
         std::cout << "compactness: " << compact << "\n";
-        std::cout << "elongation: " << elong << "\n";
+        std::cout << "aspect ratio: " << aspectRatio << "\n";
     }
 }
 
@@ -34,10 +34,10 @@ int main()
 
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
+//    showObjects(objects);
 
-    showObjects(objects);
-
-//    computeGeomParams(contours);
+    computeGeomParams(contours);
+    exit(0);
 
     rotateObjects(objects, contours);
 
