@@ -76,10 +76,14 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
     for (const cv::Mat& v : obj1Variants)
     {
         cv::Mat result;
-        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
-        //    showImg(result);
+//        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
+        cv::matchTemplate(v, obj2, result, cv::TM_CCORR_NORMED);
+        showImg(result);
+
         double maxVal;
         cv::minMaxLoc(result, nullptr, &maxVal);
+
+        std::cout << maxVal << "\n";
 
         if (maxVal > OBJECTS_ARE_SAME_THRESHOLD)
         {
@@ -121,6 +125,10 @@ void classifyObjects(const std::vector<cv::Mat>& objects, std::vector<std::vecto
         while (i < objInds.size())
         {
             const int pairInd = objInds[i];
+
+            std::cout << "compare:\n";
+            showImg(objects[first]);
+            showImg(objects[pairInd]);
 
             if (compareObjects(objects[first], objects[pairInd]))
             {

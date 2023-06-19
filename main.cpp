@@ -4,8 +4,6 @@
 #include "classification.h"
 #include "utils.h"
 
-const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
-
 struct ObjectParams
 {
     double area, perim, compact;
@@ -176,6 +174,9 @@ void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vect
 
 int main()
 {
+    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
+//    const std::string INPUT_FILE = "../../testimages/test4m.jpg";
+
     srand(time(nullptr));
 
     cv::Mat img = cv::imread(INPUT_FILE);
