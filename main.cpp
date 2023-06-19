@@ -87,11 +87,19 @@ void computeDominantColor(const cv::Mat& img)
     cv::Mat4f centers;
     cv::kmeans(data, k, labels, cv::TermCriteria(), 1, cv::KMEANS_PP_CENTERS, centers);
 
-    std::cout << "Dominant colors: \n";
+    std::vector<std::pair<int, int>> freqVec;
+    getSortedFrequencies(labels, freqVec);
 
-    std::cout << centers << "\n";
+    cv::Vec4f mostFrequent = centers.row(freqVec[0].first).at<cv::Vec4f>();
 
-//    std::cout << centers.row(getMostFrequentNumber(labels)) << "\n";
+    const cv::Vec4f bg(BG_COLOR.val[0], BG_COLOR.val[1], BG_COLOR.val[2], BG_COLOR.val[3]);
+    if (mostFrequent == bg)
+    {
+        mostFrequent = centers.row(freqVec[1].first).at<cv::Vec4f>();
+    }
+
+    std::cout << "Dominant color: \n";
+    std::cout << mostFrequent << "\n";
 }
 
 int main()
