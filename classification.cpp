@@ -1,7 +1,5 @@
 #include "classification.h"
 
-const double OBJECTS_ARE_SAME_THRESHOLD = 0.75;
-
 void rotateObjects(std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours)
 {
     for (int i = 0; i < objects.size(); i++)
@@ -63,6 +61,11 @@ void getObjVariants(const cv::Mat& obj, std::vector<cv::Mat>& variants)
 
 bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
 {
+    const double OBJECTS_ARE_SAME_THRESHOLD = 0.75;
+
+    cv::imwrite("o1.jpg", o1);
+    cv::imwrite("o2.jpg", o2);
+
     cv::Mat obj1;
     cv::Mat obj2;
     correctSizesForComparing(o1, o2, obj1, obj2);
@@ -76,8 +79,8 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
     for (const cv::Mat& v : obj1Variants)
     {
         cv::Mat result;
-//        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
-        cv::matchTemplate(v, obj2, result, cv::TM_CCORR_NORMED);
+        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
+//        cv::matchTemplate(v, obj2, result, cv::TM_CCORR_NORMED);
         showImg(result);
 
         double maxVal;
@@ -126,9 +129,9 @@ void classifyObjects(const std::vector<cv::Mat>& objects, std::vector<std::vecto
         {
             const int pairInd = objInds[i];
 
-            std::cout << "compare:\n";
-            showImg(objects[first]);
-            showImg(objects[pairInd]);
+//            std::cout << "compare:\n";
+//            showImg(objects[first]);
+//            showImg(objects[pairInd]);
 
             if (compareObjects(objects[first], objects[pairInd]))
             {

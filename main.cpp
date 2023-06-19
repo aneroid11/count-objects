@@ -174,6 +174,22 @@ void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vect
 
 int main()
 {
+//    cv::Mat o1 = cv::imread("../../testimages/o12.jpg");
+////    cv::Mat o2 = cv::imread("../../testimages/o23.jpg");
+//    cv::Mat o2 = cv::imread("../../testimages/o2.jpg");
+//
+//    cv::Mat res;
+//    cv::matchTemplate(o1, o2, res, cv::TM_CCOEFF_NORMED);
+//
+//    double min, max;
+//    cv::minMaxLoc(res, &min, &max);
+//    std::cout << "min: " << min << "\n";
+//    std::cout << "max: " << max << "\n";
+//
+//    showImg(res);
+//
+//    exit(0);
+
     const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
 //    const std::string INPUT_FILE = "../../testimages/test4m.jpg";
 
@@ -187,7 +203,7 @@ int main()
 
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
-    showObjects(objects);
+//    showObjects(objects);
 
     std::vector<std::vector<int>> objClasses;
 

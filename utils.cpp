@@ -29,4 +29,7 @@ void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, const double angle)
     rotM.at<double>(1,2) += bbox.height/2.0 - srcImg.rows/2.0;
 
     cv::warpAffine(srcImg, dstImg, rotM, cv::Size(bbox.width, bbox.height));
+//    cv::warpAffine(srcImg, dstImg, rotM, cv::Size(width, height));
+
+    showImg(dstImg);
 }
