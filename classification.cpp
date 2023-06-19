@@ -64,7 +64,7 @@ void getObjVariants(const cv::Mat& obj, std::vector<cv::Mat>& variants)
 
 bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
 {
-    const double OBJECTS_ARE_SAME_THRESHOLD = 0.65;
+    const double OBJECTS_ARE_SAME_THRESHOLD = 0.55;
 
     cv::Mat obj1 = o1;
     cv::Mat obj2;
@@ -78,8 +78,8 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
 //    cv::imwrite("o1.jpg", obj1);
 //    cv::imwrite("o2.jpg", obj2);
 
-    showImg(obj1);
-    showImg(obj2);
+//    showImg(obj1);
+//    showImg(obj2);
 
     for (const cv::Mat& v : obj1Variants)
     {
@@ -93,7 +93,7 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
         double maxVal;
         cv::minMaxLoc(result, nullptr, &maxVal);
 
-//        std::cout << maxVal << "\n";
+        std::cout << maxVal << "\n";
 
         if (maxVal > OBJECTS_ARE_SAME_THRESHOLD)
         {

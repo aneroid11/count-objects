@@ -206,8 +206,8 @@ int main()
 //    testMatchTemplate();
 
 //    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
-//    const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
-    const std::string INPUT_FILE = "../../testimages/test3m.jpg";
+    const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
+//    const std::string INPUT_FILE = "../../testimages/test4m.jpg";
 
     srand(time(nullptr));
 
