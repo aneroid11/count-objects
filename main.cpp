@@ -6,55 +6,14 @@
 
 const std::string INPUT_FILE = "../../testimages/test3m.jpg";
 
-
-
-void computeParams(cv::Mat& img,
-                   const std::vector<std::vector<cv::Point>>& contours,
-                   const std::vector<cv::Mat>& objects)
+struct ObjectParams
 {
-    for (int i = 0; i < contours.size(); i++)
-    {
-        const auto& cont = contours[i];
-        const auto& obj = objects[i];
-
-        cv::imshow("", obj);
-        cv::waitKey();
-
-        const double area = cv::contourArea(cont);
-        const double perim = cv::arcLength(cont, true);
-        const double compact = perim * perim / area;
-
-        const cv::RotatedRect rect = cv::minAreaRect(cont);
-
-        cv::Point2f vertices[4];
-        rect.points(vertices);
-        for (int j = 0; j < 4; j++)
-        {
-            cv::line(img, vertices[j], vertices[(j + 1) % 4], cv::Scalar(255, 255, 255), 2);
-        }
-
-        const double rw = rect.size.width;
-        const double rh = rect.size.height;
-        const double aspectRatio = std::min(rw, rh) / std::max(rw, rh);
-        const double extent = area / (rw * rh);
-
-        std::vector<cv::Point> convexHull;
-        cv::convexHull(cont, convexHull);
-        const double hullArea = cv::contourArea(convexHull);
-        const double solidity = area / hullArea;
-
-        std::cout << "object:\n";
-        std::cout << "area: " << area << "\n";
-        std::cout << "perimeter: " << perim << "\n";
-        std::cout << "compactness: " << compact << "\n";
-        std::cout << "aspect ratio: " << aspectRatio << "\n";
-        std::cout << "extent: " << extent << "\n";
-        std::cout << "solidity: " << solidity << "\n";
-    }
-
-    cv::imshow("", img);
-    cv::waitKey();
-}
+    double area, perim, compact;
+    double aspectRatio;
+    double extent;
+    double solidity;
+    double domR, domG, domB;
+};
 
 void getSortedFrequencies(const std::vector<int>& vec, std::vector<std::pair<int, int>>& freqVec) {
     std::unordered_map<int, int> freqs;
@@ -72,7 +31,7 @@ void getSortedFrequencies(const std::vector<int>& vec, std::vector<std::pair<int
               });
 }
 
-void computeDominantColor(const cv::Mat& img)
+cv::Vec3f computeDominantColor(const cv::Mat& img)
 {
     cv::Mat data;
     img.convertTo(data, CV_32F);
@@ -94,8 +53,46 @@ void computeDominantColor(const cv::Mat& img)
         mostFrequent = centers.row(freqVec[1].first).at<cv::Vec4f>();
     }
 
-    std::cout << "Dominant color: \n";
-    std::cout << mostFrequent << "\n";
+    return {mostFrequent.val[0], mostFrequent.val[1], mostFrequent.val[2]};
+}
+
+void computeParams(const std::vector<std::vector<cv::Point>>& contours,
+                   const std::vector<cv::Mat>& objects,
+                   std::vector<ObjectParams>& params)
+{
+    for (int i = 0; i < contours.size(); i++)
+    {
+        const auto& cont = contours[i];
+        const auto& obj = objects[i];
+
+        const double area = cv::contourArea(cont);
+        const double perim = cv::arcLength(cont, true);
+        const double compact = perim * perim / area;
+
+        const cv::RotatedRect rect = cv::minAreaRect(cont);
+
+        const double rw = rect.size.width;
+        const double rh = rect.size.height;
+        const double aspectRatio = std::min(rw, rh) / std::max(rw, rh);
+        const double extent = area / (rw * rh);
+
+        std::vector<cv::Point> convexHull;
+        cv::convexHull(cont, convexHull);
+        const double hullArea = cv::contourArea(convexHull);
+        const double solidity = area / hullArea;
+
+        params[i].area = area;
+        params[i].perim = perim;
+        params[i].compact = compact;
+        params[i].solidity = solidity;
+        params[i].aspectRatio = aspectRatio;
+        params[i].extent = extent;
+
+        const cv::Vec3f domColor = computeDominantColor(obj);
+        params[i].domB = domColor.val[0];
+        params[i].domG = domColor.val[1];
+        params[i].domR = domColor.val[2];
+    }
 }
 
 void classifyUsingTemplateMatching(std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours,
@@ -108,7 +105,23 @@ void classifyUsingTemplateMatching(std::vector<cv::Mat>& objects, const std::vec
 void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours,
                             std::vector<std::vector<int>>& objClasses)
 {
-    
+    std::vector<ObjectParams> params(objects.size());
+    computeParams(contours, objects, params);
+
+    std::cout << "objects:\n\n";
+    for (int i = 0; i < params.size(); i++)
+    {
+        const auto& p = params[i];
+        std::cout << "area: " << p.area << "\n";
+        std::cout << "perim: " << p.perim << "\n";
+        std::cout << "compact: " << p.compact << "\n";
+        std::cout << "extent: " << p.extent << "\n";
+        std::cout << "asp ratio: " << p.aspectRatio << "\n";
+        std::cout << "solidity: " << p.solidity << "\n";
+        std::cout << "r: " << p.domR << "\n";
+        std::cout << "g: " << p.domG << "\n";
+        std::cout << "b: " << p.domB << "\n\n";
+    }
 }
 
 int main()
