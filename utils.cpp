@@ -6,13 +6,14 @@ void showImg(const cv::Mat& img)
     cv::waitKey();
 }
 
-double getOrientationAngle(const std::vector<cv::Point>& contour)
+double getOrientationAngle(const std::vector<cv::Point>& contour, cv::Size2f* rectSize)
 {
     cv::RotatedRect rect = cv::fitEllipse(contour);
+    *rectSize = rect.size;
     return rect.angle;
 }
 
-void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, const double angle)
+void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, double angle, double objW, double objH)
 {
     const int width = srcImg.cols;
     const int height = srcImg.rows;
@@ -31,5 +32,10 @@ void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, const double angle)
     cv::warpAffine(srcImg, dstImg, rotM, cv::Size(bbox.width, bbox.height));
 //    cv::warpAffine(srcImg, dstImg, rotM, cv::Size(width, height));
 
-    showImg(dstImg);
+    int dstCenterX = dstImg.cols / 2;
+    int dstCenterY = dstImg.rows / 2;
+    double halfObjW = objW / 2;
+    double halfObjH = objH / 2;
+//    showImg(dstImg(cv::Rect(dstCenterX - halfObjW, dstCenterY - halfObjH, objW, objH)));
+    dstImg = dstImg(cv::Rect(dstCenterX - halfObjW, dstCenterY - halfObjH, objW, objH));
 }

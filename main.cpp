@@ -174,9 +174,12 @@ void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vect
 
 int main()
 {
-//    cv::Mat o1 = cv::imread("../../testimages/o12.jpg");
+//    cv::Mat o1 = cv::imread("../../testimages/what/o1.jpg");
+//
+//    std::cout << (o1.type() == CV_8U) << "\n";
+//
 ////    cv::Mat o2 = cv::imread("../../testimages/o23.jpg");
-//    cv::Mat o2 = cv::imread("../../testimages/o2.jpg");
+//    cv::Mat o2 = cv::imread("../../testimages/what/o2.jpg");
 //
 //    cv::Mat res;
 //    cv::matchTemplate(o1, o2, res, cv::TM_CCOEFF_NORMED);
