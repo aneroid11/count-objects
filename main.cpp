@@ -6,6 +6,8 @@
 
 const std::string INPUT_FILE = "../../testimages/test3m.jpg";
 
+
+
 void computeParams(cv::Mat& img,
                    const std::vector<std::vector<cv::Point>>& contours,
                    const std::vector<cv::Mat>& objects)
@@ -48,12 +50,6 @@ void computeParams(cv::Mat& img,
         std::cout << "aspect ratio: " << aspectRatio << "\n";
         std::cout << "extent: " << extent << "\n";
         std::cout << "solidity: " << solidity << "\n";
-
-//        cv::Mat data = obj.reshape(1, obj.total());
-//
-//        cv::calcHist()
-//
-//        cv::kmeans()
     }
 
     cv::imshow("", img);
@@ -102,13 +98,23 @@ void computeDominantColor(const cv::Mat& img)
     std::cout << mostFrequent << "\n";
 }
 
+void classifyUsingTemplateMatching(std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours,
+                                   std::vector<std::vector<int>>& objClasses)
+{
+    rotateObjects(objects, contours);
+    classifyObjects(objects, objClasses);
+}
+
+void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours,
+                            std::vector<std::vector<int>>& objClasses)
+{
+    
+}
+
 int main()
 {
     cv::Mat img = cv::imread(INPUT_FILE);
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
-
-//    computeDominantColor(img);
-//    exit(0);
 
     std::vector<std::vector<cv::Point>> contours;
     findContoursCanny(img, contours);
@@ -117,16 +123,14 @@ int main()
     extractObjects(img, contours, objects);
 //    showObjects(objects);
 
-    showImg(objects[0]);
-    computeDominantColor(objects[0]);
+//    showImg(objects[3]);
+//    computeDominantColor(objects[3]);
 //    computeParams(img, contours, objects);
-    exit(0);
 
-    rotateObjects(objects, contours);
-
-//    compareObjects(objects[0], objects[4]);
     std::vector<std::vector<int>> objClasses;
-    classifyObjects(objects, objClasses);
+//    classifyUsingTemplateMatching(objects, contours, objClasses);
+    classifyUsingObjParams(objects, contours, objClasses);
+    exit(0);
 
     drawClassification(img, contours, objClasses);
     showImg(img);
