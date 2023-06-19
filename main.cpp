@@ -186,18 +186,14 @@ int main()
 
     std::vector<cv::Mat> objects;
     extractObjects(img, contours, objects);
-//    showObjects(objects);
-
-//    showImg(objects[3]);
-//    computeDominantColor(objects[3]);
-//    computeParams(img, contours, objects);
+    showObjects(objects);
 
     std::vector<std::vector<int>> objClasses;
 
     // std::unique_ptr<Classifier> classifier = new ParamsClassifier(objects, contours);
     // classifier.classify(objClasses);
-    classifyUsingObjParams(objects, contours, objClasses);
-//    exit(0);
+    classifyUsingTemplateMatching(objects, contours, objClasses);
+//    classifyUsingObjParams(objects, contours, objClasses);
 
     drawClassification(img, contours, objClasses);
     showImg(img);
