@@ -172,30 +172,42 @@ void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vect
     classifyObjectsByParams(params, objClasses);
 }
 
+void testMatchTemplate()
+{
+    cv::Mat o1 = cv::imread("../../testimages/what/o1.jpg");
+    cv::Mat o2 = cv::imread("../../testimages/what/o2.jpg");
+
+    cv::flip(o1, o1, -1);
+
+//    correctSizesForComparing(o1, o2, o1, o2);
+    const int o1width = o1.cols;
+    const int o1height = o1.rows;
+    cv::copyMakeBorder(o2, o2, o1height/2, o1height/2, o1width/2, o1width/2,
+                       cv::BORDER_CONSTANT,
+                       BG_COLOR);
+    showImg(o1);
+    showImg(o2);
+
+    cv::Mat res;
+    cv::matchTemplate(o1, o2, res, cv::TM_CCOEFF_NORMED);
+
+    double min, max;
+    cv::minMaxLoc(res, &min, &max);
+    std::cout << "min: " << min << "\n";
+    std::cout << "max: " << max << "\n";
+
+    showImg(res);
+
+    exit(0);
+}
+
 int main()
 {
-//    cv::Mat o1 = cv::imread("../../testimages/what/o1.jpg");
-//
-//    std::cout << (o1.type() == CV_8U) << "\n";
-//
-////    cv::Mat o2 = cv::imread("../../testimages/o23.jpg");
-//    cv::Mat o2 = cv::imread("../../testimages/what/o2.jpg");
-//
-//    cv::Mat res;
-//    cv::matchTemplate(o1, o2, res, cv::TM_CCOEFF_NORMED);
-//
-//    double min, max;
-//    cv::minMaxLoc(res, &min, &max);
-//    std::cout << "min: " << min << "\n";
-//    std::cout << "max: " << max << "\n";
-//
-//    showImg(res);
-//
-//    exit(0);
+//    testMatchTemplate();
 
 //    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
 //    const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
-    const std::string INPUT_FILE = "../../testimages/test2m.jpg";
+    const std::string INPUT_FILE = "../../testimages/test3m.jpg";
 
     srand(time(nullptr));
 
