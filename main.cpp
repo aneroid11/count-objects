@@ -4,7 +4,7 @@
 #include "classification.h"
 #include "utils.h"
 
-const std::string INPUT_FILE = "../../testimages/test3m.jpg";
+const std::string INPUT_FILE = "../../testimages/test4m.jpg";
 
 struct ObjectParams
 {
@@ -117,33 +117,61 @@ bool compareObjects(const ObjectParams& o1, const ObjectParams& o2)
     return true;
 }
 
+void classifyObjectsByParams(const std::vector<ObjectParams>& params, std::vector<std::vector<int>>& classes)
+{
+    // TODO: remove this duplication
+
+    classes.clear();
+
+    std::vector<int> objInds;
+    for (int i = 0; i < params.size(); i++) { objInds.push_back(i); }
+
+    while (true)
+    {
+        if (objInds.empty())
+        {
+            return;
+        }
+        if (objInds.size() < 2)
+        {
+            classes.push_back(objInds);
+            return;
+        }
+
+        std::vector<int> currClass;
+        const int first = objInds[0];
+
+        auto position = std::find(objInds.begin(), objInds.end(), first);
+        objInds.erase(position);
+
+        currClass.push_back(first);
+
+        int i = 0;
+        while (i < objInds.size())
+        {
+            const int pairInd = objInds[i];
+
+            if (compareObjects(params[first], params[pairInd]))
+            {
+                position = std::find(objInds.begin(), objInds.end(), pairInd);
+                objInds.erase(position);
+
+                currClass.push_back(pairInd);
+                continue;
+            }
+            i++;
+        }
+
+        classes.push_back(currClass);
+    }
+}
+
 void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours,
                             std::vector<std::vector<int>>& objClasses)
 {
     std::vector<ObjectParams> params(objects.size());
     computeParams(contours, objects, params);
-
-    const int o0 = 0;
-    const int o1 = 3;
-    showImg(objects[o0]);
-    showImg(objects[o1]);
-
-    std::cout << compareObjects(params[o0], params[o1]) << "\n";
-
-//    std::cout << "objects:\n\n";
-//    for (int i = 0; i < params.size(); i++)
-//    {
-//        const auto& p = params[i];
-//        std::cout << "area: " << p.area << "\n";
-//        std::cout << "perim: " << p.perim << "\n";
-//        std::cout << "compact: " << p.compact << "\n";
-//        std::cout << "extent: " << p.extent << "\n";
-//        std::cout << "asp ratio: " << p.aspectRatio << "\n";
-//        std::cout << "solidity: " << p.solidity << "\n";
-//        std::cout << "r: " << p.domR << "\n";
-//        std::cout << "g: " << p.domG << "\n";
-//        std::cout << "b: " << p.domB << "\n\n";
-//    }
+    classifyObjectsByParams(params, objClasses);
 }
 
 int main()
@@ -163,9 +191,11 @@ int main()
 //    computeParams(img, contours, objects);
 
     std::vector<std::vector<int>> objClasses;
-//    classifyUsingTemplateMatching(objects, contours, objClasses);
+
+    // std::unique_ptr<Classifier> classifier = new ParamsClassifier(objects, contours);
+    // classifier.classify(objClasses);
     classifyUsingObjParams(objects, contours, objClasses);
-    exit(0);
+//    exit(0);
 
     drawClassification(img, contours, objClasses);
     showImg(img);
