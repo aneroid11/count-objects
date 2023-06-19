@@ -32,12 +32,15 @@ void getSortedFrequencies(const std::vector<int>& vec, std::vector<std::pair<int
 cv::Vec3f computeDominantColor(const cv::Mat& img)
 {
     cv::Mat data;
+    std::cout << "before\n";
     img.convertTo(data, CV_32F);
+    std::cout << "before\n";
+
     data = data.reshape(1, data.total());
 
     const int k = 5;
     std::vector<int> labels;
-    cv::Mat4f centers;
+    cv::Mat3f centers;
     cv::kmeans(data, k, labels, cv::TermCriteria(), 1, cv::KMEANS_PP_CENTERS, centers);
 
     std::vector<std::pair<int, int>> freqVec;
@@ -45,8 +48,8 @@ cv::Vec3f computeDominantColor(const cv::Mat& img)
 
     cv::Vec3f mostFrequent = centers.row(freqVec[0].first).at<cv::Vec3f>();
 
-    const cv::Vec3f bg(BG_COLOR.val[0], BG_COLOR.val[1], BG_COLOR.val[2]);
-    if (mostFrequent == bg)
+//    const cv::Vec3f bg(BG_COLOR.val[0], BG_COLOR.val[1], BG_COLOR.val[2]);
+    if (mostFrequent.val[0] < 2 && mostFrequent.val[1] < 2 && mostFrequent.val[2] < 2)
     {
         mostFrequent = centers.row(freqVec[1].first).at<cv::Vec3f>();
     }
@@ -102,20 +105,27 @@ void classifyUsingTemplateMatching(std::vector<cv::Mat>& objects, const std::vec
 
 bool compareObjects(const ObjectParams& o1, const ObjectParams& o2)
 {
+    std::cout << o1.domR << "\n";
+    std::cout << o1.domG << "\n";
+    std::cout << o1.domB << "\n";
+    std::cout << o2.domR << "\n";
+    std::cout << o2.domG << "\n";
+    std::cout << o2.domB << "\n\n";
+
     if (std::min(o1.area, o2.area) / std::max(o1.area, o2.area) < 0.85) { return false; }
     if (std::min(o1.perim, o2.perim) / std::max(o1.perim, o2.perim) < 0.85) { return false; }
     if (std::min(o1.compact, o2.compact) / std::max(o1.compact, o2.compact) < 0.8) { return false; }
     if (std::abs(o1.extent - o2.extent) > 0.1) { return false; }
     if (std::abs(o1.aspectRatio - o2.aspectRatio) > 0.1) { return false; }
     if (std::abs(o1.solidity - o2.solidity) > 0.1) { return false; }
-    if (std::abs(o1.domR - o2.domR) > 60) { return false; }
-    if (std::abs(o1.domG - o2.domG) > 60) { return false; }
-    if (std::abs(o1.domB - o2.domB) > 60) { return false; }
+    if (std::abs(o1.domR - o2.domR) > 80) { return false; }
+    if (std::abs(o1.domG - o2.domG) > 80) { return false; }
+    if (std::abs(o1.domB - o2.domB) > 80) { return false; }
 
     return true;
 }
 
-void classifyObjectsByParams(const std::vector<ObjectParams>& params, std::vector<std::vector<int>>& classes)
+void classifyObjectsByParams(const std::vector<cv::Mat>& objects, const std::vector<ObjectParams>& params, std::vector<std::vector<int>>& classes)
 {
     // TODO: remove this duplication
 
@@ -149,6 +159,9 @@ void classifyObjectsByParams(const std::vector<ObjectParams>& params, std::vecto
         {
             const int pairInd = objInds[i];
 
+//            showImg(objects[first]);
+//            showImg(objects[pairInd]);
+
             if (compareObjects(params[first], params[pairInd]))
             {
                 position = std::find(objInds.begin(), objInds.end(), pairInd);
@@ -169,7 +182,7 @@ void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vect
 {
     std::vector<ObjectParams> params(objects.size());
     computeParams(contours, objects, params);
-    classifyObjectsByParams(params, objClasses);
+    classifyObjectsByParams(objects, params, objClasses);
 }
 
 void testMatchTemplate()
@@ -180,16 +193,16 @@ void testMatchTemplate()
     cv::flip(o1, o1, -1);
 
 //    correctSizesForComparing(o1, o2, o1, o2);
-    const int o1width = o1.cols;
-    const int o1height = o1.rows;
-    cv::copyMakeBorder(o2, o2, o1height/2, o1height/2, o1width/2, o1width/2,
-                       cv::BORDER_CONSTANT,
-                       BG_COLOR);
+//    const int o1width = o1.cols;
+//    const int o1height = o1.rows;
+//    cv::copyMakeBorder(o2, o2, o1height/2, o1height/2, o1width/2, o1width/2,
+//                       cv::BORDER_CONSTANT,
+//                       BG_COLOR);
     showImg(o1);
     showImg(o2);
 
     cv::Mat res;
-    cv::matchTemplate(o1, o2, res, cv::TM_CCOEFF_NORMED);
+    cv::matchTemplate(o1, o2, res, cv::TM_SQDIFF_NORMED);
 
     double min, max;
     cv::minMaxLoc(res, &min, &max);
@@ -207,7 +220,7 @@ int main()
 
 //    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
     const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
-//    const std::string INPUT_FILE = "../../testimages/test4m.jpg";
+//    const std::string INPUT_FILE = "../../testimages/test2m.jpg";
 
     srand(time(nullptr));
 
@@ -225,8 +238,8 @@ int main()
 
     // std::unique_ptr<Classifier> classifier = new ParamsClassifier(objects, contours);
     // classifier.classify(objClasses);
-    classifyUsingTemplateMatching(objects, contours, objClasses);
-//    classifyUsingObjParams(objects, contours, objClasses);
+//    classifyUsingTemplateMatching(objects, contours, objClasses);
+    classifyUsingObjParams(objects, contours, objClasses);
 
     drawClassification(img, contours, objClasses);
     showImg(img);
