@@ -43,15 +43,15 @@ cv::Vec3f computeDominantColor(const cv::Mat& img)
     std::vector<std::pair<int, int>> freqVec;
     getSortedFrequencies(labels, freqVec);
 
-    cv::Vec4f mostFrequent = centers.row(freqVec[0].first).at<cv::Vec4f>();
+    cv::Vec3f mostFrequent = centers.row(freqVec[0].first).at<cv::Vec3f>();
 
-    const cv::Vec4f bg(BG_COLOR.val[0], BG_COLOR.val[1], BG_COLOR.val[2], BG_COLOR.val[3]);
+    const cv::Vec3f bg(BG_COLOR.val[0], BG_COLOR.val[1], BG_COLOR.val[2]);
     if (mostFrequent == bg)
     {
-        mostFrequent = centers.row(freqVec[1].first).at<cv::Vec4f>();
+        mostFrequent = centers.row(freqVec[1].first).at<cv::Vec3f>();
     }
 
-    return {mostFrequent.val[0], mostFrequent.val[1], mostFrequent.val[2]};
+    return mostFrequent;
 }
 
 void computeParams(const std::vector<std::vector<cv::Point>>& contours,
@@ -200,7 +200,7 @@ int main()
     srand(time(nullptr));
 
     cv::Mat img = cv::imread(INPUT_FILE);
-    cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
+//    cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
     std::vector<std::vector<cv::Point>> contours;
     findContoursCanny(img, contours);

@@ -8,7 +8,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-const cv::Vec4b BG_COLOR = cv::Vec4b(0, 0, 0, 0);
+const cv::Vec3b BG_COLOR = cv::Vec3b(0, 0, 0);
 
 void showImg(const cv::Mat& img);
 double getOrientationAngle(const std::vector<cv::Point>& contour, cv::Size2f* rectSize = nullptr);

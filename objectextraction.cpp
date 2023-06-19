@@ -54,11 +54,11 @@ void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>
                                                    false);
                 if (dist >= 0)
                 {
-                    newObj.at<cv::Vec4b>(y, x) = img.at<cv::Vec4b>(y + bounds.y, x + bounds.x);
+                    newObj.at<cv::Vec3b>(y, x) = img.at<cv::Vec3b>(y + bounds.y, x + bounds.x);
                 }
                 else
                 {
-                    newObj.at<cv::Vec4b>(y, x) = BG_COLOR;
+                    newObj.at<cv::Vec3b>(y, x) = BG_COLOR;
                 }
             }
         }
