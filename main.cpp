@@ -106,7 +106,7 @@ bool compareObjects(const ObjectParams& o1, const ObjectParams& o2)
 {
     if (std::min(o1.area, o2.area) / std::max(o1.area, o2.area) < 0.85) { return false; }
     if (std::min(o1.perim, o2.perim) / std::max(o1.perim, o2.perim) < 0.85) { return false; }
-    if (std::min(o1.compact, o2.compact) / std::max(o1.compact, o2.compact) < 0.85) { return false; }
+    if (std::min(o1.compact, o2.compact) / std::max(o1.compact, o2.compact) < 0.8) { return false; }
     if (std::abs(o1.extent - o2.extent) > 0.1) { return false; }
     if (std::abs(o1.aspectRatio - o2.aspectRatio) > 0.1) { return false; }
     if (std::abs(o1.solidity - o2.solidity) > 0.1) { return false; }
