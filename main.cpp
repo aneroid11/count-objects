@@ -193,8 +193,9 @@ int main()
 //
 //    exit(0);
 
-    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
-//    const std::string INPUT_FILE = "../../testimages/test4m.jpg";
+//    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
+//    const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
+    const std::string INPUT_FILE = "../../testimages/test2m.jpg";
 
     srand(time(nullptr));
 

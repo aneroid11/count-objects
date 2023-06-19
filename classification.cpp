@@ -70,16 +70,16 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
     cv::Mat obj2;
     correctSizesForComparing(o1, o2, obj1, obj2);
 
-    cv::cvtColor(obj1, obj1, cv::COLOR_BGRA2BGR);
-    cv::cvtColor(obj2, obj2, cv::COLOR_BGRA2BGR);
+//    cv::cvtColor(obj1, obj1, cv::COLOR_BGRA2BGR);
+//    cv::cvtColor(obj2, obj2, cv::COLOR_BGRA2BGR);
 
     std::cout << obj1.type() << "\n";
 
     std::vector<cv::Mat> obj1Variants;
     getObjVariants(obj1, obj1Variants);
 
-    cv::imwrite("o1.jpg", obj1);
-    cv::imwrite("o2.jpg", obj2);
+//    cv::imwrite("o1.jpg", obj1);
+//    cv::imwrite("o2.jpg", obj2);
 
 //    showImg(obj1);
 //    showImg(obj2);
@@ -87,11 +87,11 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
     for (const cv::Mat& v : obj1Variants)
     {
         cv::Mat result;
-        std::cout << "before\n";
-        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
-        std::cout << "after\n";
-//        cv::matchTemplate(v, obj2, result, cv::TM_CCORR_NORMED);
-        showImg(result);
+//        std::cout << "before\n";
+//        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
+//        std::cout << "after\n";
+        cv::matchTemplate(v, obj2, result, cv::TM_CCORR_NORMED);
+//        showImg(result);
 
         double maxVal;
         cv::minMaxLoc(result, nullptr, &maxVal);
@@ -140,8 +140,8 @@ void classifyObjects(const std::vector<cv::Mat>& objects, std::vector<std::vecto
             const int pairInd = objInds[i];
 
             std::cout << "compare:\n";
-            showImg(objects[first]);
-            showImg(objects[pairInd]);
+//            showImg(objects[first]);
+//            showImg(objects[pairInd]);
 
             if (compareObjects(objects[first], objects[pairInd]))
             {

@@ -32,10 +32,10 @@ void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, double angle, double objW
     cv::warpAffine(srcImg, dstImg, rotM, cv::Size(bbox.width, bbox.height));
 //    cv::warpAffine(srcImg, dstImg, rotM, cv::Size(width, height));
 
-    int dstCenterX = dstImg.cols / 2;
-    int dstCenterY = dstImg.rows / 2;
-    double halfObjW = objW / 2;
-    double halfObjH = objH / 2;
+//    int dstCenterX = dstImg.cols / 2;
+//    int dstCenterY = dstImg.rows / 2;
+//    double halfObjW = objW / 2;
+//    double halfObjH = objH / 2;
 //    showImg(dstImg(cv::Rect(dstCenterX - halfObjW, dstCenterY - halfObjH, objW, objH)));
-    dstImg = dstImg(cv::Rect(dstCenterX - halfObjW, dstCenterY - halfObjH, objW, objH));
+//    dstImg = dstImg(cv::Rect(dstCenterX - halfObjW, dstCenterY - halfObjH, objW, objH));
 }
