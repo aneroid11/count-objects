@@ -102,26 +102,38 @@ void classifyUsingTemplateMatching(std::vector<cv::Mat>& objects, const std::vec
     classifyObjects(objects, objClasses);
 }
 
+bool compareObjects(const ObjectParams& o1, const ObjectParams& o2)
+{
+    return true;
+}
+
 void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours,
                             std::vector<std::vector<int>>& objClasses)
 {
     std::vector<ObjectParams> params(objects.size());
     computeParams(contours, objects, params);
 
-    std::cout << "objects:\n\n";
-    for (int i = 0; i < params.size(); i++)
-    {
-        const auto& p = params[i];
-        std::cout << "area: " << p.area << "\n";
-        std::cout << "perim: " << p.perim << "\n";
-        std::cout << "compact: " << p.compact << "\n";
-        std::cout << "extent: " << p.extent << "\n";
-        std::cout << "asp ratio: " << p.aspectRatio << "\n";
-        std::cout << "solidity: " << p.solidity << "\n";
-        std::cout << "r: " << p.domR << "\n";
-        std::cout << "g: " << p.domG << "\n";
-        std::cout << "b: " << p.domB << "\n\n";
-    }
+    const int o0 = 0;
+    const int o1 = 1;
+    showImg(objects[o0]);
+    showImg(objects[o1]);
+
+    std::cout << compareObjects(params[o0], params[o1]) << "\n";
+
+//    std::cout << "objects:\n\n";
+//    for (int i = 0; i < params.size(); i++)
+//    {
+//        const auto& p = params[i];
+//        std::cout << "area: " << p.area << "\n";
+//        std::cout << "perim: " << p.perim << "\n";
+//        std::cout << "compact: " << p.compact << "\n";
+//        std::cout << "extent: " << p.extent << "\n";
+//        std::cout << "asp ratio: " << p.aspectRatio << "\n";
+//        std::cout << "solidity: " << p.solidity << "\n";
+//        std::cout << "r: " << p.domR << "\n";
+//        std::cout << "g: " << p.domG << "\n";
+//        std::cout << "b: " << p.domB << "\n\n";
+//    }
 }
 
 int main()
