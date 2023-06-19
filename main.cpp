@@ -4,7 +4,7 @@
 #include "classification.h"
 #include "utils.h"
 
-const std::string INPUT_FILE = "../../testimages/test4m.jpg";
+const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
 
 struct ObjectParams
 {
@@ -176,6 +176,8 @@ void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vect
 
 int main()
 {
+    srand(time(nullptr));
+
     cv::Mat img = cv::imread(INPUT_FILE);
     cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 

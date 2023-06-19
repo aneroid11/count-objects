@@ -11,7 +11,7 @@ void findContoursCanny(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
 
     cv::Mat edged;
     cv::Canny(contrasted, edged, 85, 255);
-//    showImg(edged);
+    showImg(edged);
 
     const int kernelW = img.cols / 120;
     const int kernelH = img.rows / 120;
@@ -19,7 +19,7 @@ void findContoursCanny(const cv::Mat& img, std::vector<std::vector<cv::Point>>& 
     cv::Mat morphed;
 //    cv::morphologyEx(edged, closed, cv::MORPH_CLOSE, kernel);
     cv::dilate(edged, morphed, kernel);
-//    showImg(morphed);
+    showImg(morphed);
 
     std::vector<std::vector<cv::Point>> allContours;
     cv::findContours(morphed, allContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
