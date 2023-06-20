@@ -47,3 +47,46 @@ void rotateImg(const cv::Mat& srcImg, cv::Mat& dstImg, double angle, double objW
 
 //    showImg(dstImg);
 }
+
+void getSortedFrequencies(const std::vector<int>& vec, std::vector<std::pair<int, int>>& freqVec)
+{
+    std::unordered_map<int, int> freqs;
+    const int n = vec.size();
+    for (int i = 0; i < n; i++) {
+        freqs[vec[i]]++;
+    }
+
+    std::copy(freqs.begin(), freqs.end(), std::back_inserter<std::vector<std::pair<int, int>>>(freqVec));
+
+    std::sort(freqVec.begin(), freqVec.end(),
+              [](const std::pair<int, int>& p1, const std::pair<int, int>& p2) -> bool
+              {
+                  return p1.second > p2.second;
+              });
+}
+
+cv::Vec3f computeDominantColor(const cv::Mat& img)
+{
+    cv::Mat data;
+    img.convertTo(data, CV_32F);
+
+    data = data.reshape(1, data.total());
+
+    const int k = 5;
+    std::vector<int> labels;
+    cv::Mat3f centers;
+    cv::kmeans(data, k, labels, cv::TermCriteria(), 1, cv::KMEANS_PP_CENTERS, centers);
+
+    std::vector<std::pair<int, int>> freqVec;
+    getSortedFrequencies(labels, freqVec);
+
+    cv::Vec3f mostFrequent = centers.row(freqVec[0].first).at<cv::Vec3f>();
+
+//    const cv::Vec3f bg(BG_COLOR.val[0], BG_COLOR.val[1], BG_COLOR.val[2]);
+    if (mostFrequent.val[0] < 2 && mostFrequent.val[1] < 2 && mostFrequent.val[2] < 2)
+    {
+        mostFrequent = centers.row(freqVec[1].first).at<cv::Vec3f>();
+    }
+
+    return mostFrequent;
+}
