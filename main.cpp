@@ -6,66 +6,6 @@
 #include "TemplateMatchClassifier.h"
 #include "ParamsClassifier.h"
 
-//void classifyObjectsByParams(const std::vector<cv::Mat>& objects, const std::vector<ObjectParams>& params, std::vector<std::vector<int>>& classes)
-//{
-//    // TODO: remove this duplication
-//
-//    classes.clear();
-//
-//    std::vector<int> objInds;
-//    for (int i = 0; i < params.size(); i++) { objInds.push_back(i); }
-//
-//    while (true)
-//    {
-//        if (objInds.empty())
-//        {
-//            return;
-//        }
-//        if (objInds.size() < 2)
-//        {
-//            classes.push_back(objInds);
-//            return;
-//        }
-//
-//        std::vector<int> currClass;
-//        const int first = objInds[0];
-//
-//        auto position = std::find(objInds.begin(), objInds.end(), first);
-//        objInds.erase(position);
-//
-//        currClass.push_back(first);
-//
-//        int i = 0;
-//        while (i < objInds.size())
-//        {
-//            const int pairInd = objInds[i];
-//
-////            showImg(objects[first]);
-////            showImg(objects[pairInd]);
-//
-//            if (compareObjects(params[first], params[pairInd]))
-//            {
-//                position = std::find(objInds.begin(), objInds.end(), pairInd);
-//                objInds.erase(position);
-//
-//                currClass.push_back(pairInd);
-//                continue;
-//            }
-//            i++;
-//        }
-//
-//        classes.push_back(currClass);
-//    }
-//}
-//
-//void classifyUsingObjParams(const std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours,
-//                            std::vector<std::vector<int>>& objClasses)
-//{
-//    std::vector<ObjectParams> params(objects.size());
-//    computeParams(contours, objects, params);
-//    classifyObjectsByParams(objects, params, objClasses);
-//}
-
 void testMatchTemplate()
 {
     cv::Mat o1 = cv::imread("../../testimages/what/o1.jpg");
@@ -98,20 +38,16 @@ int main()
 {
 //    testMatchTemplate();
 
-//    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
-//    const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
     const std::string INPUT_FILE = "../../testimages/test4.jpg";
 
     srand(time(nullptr));
 
     cv::Mat img = cv::imread(INPUT_FILE);
 
-    std::vector<std::vector<cv::Point>> contours;
-    findContoursCanny(img, contours);
-
-    std::vector<cv::Mat> objects;
-    extractObjects(img, contours, objects);
-//    showObjects(objects);
+    std::unique_ptr<ObjectsExtractor> extractor(new ObjectsExtractor(img));
+    const std::vector<std::vector<cv::Point>>& contours = extractor->getContours();
+    const std::vector<cv::Mat>& objects = extractor->getObjects();
+    extractor->showObjects();
 
     std::vector<std::vector<int>> objClasses;
 
