@@ -192,7 +192,6 @@ void testMatchTemplate()
 
     cv::flip(o1, o1, -1);
 
-//    correctSizesForComparing(o1, o2, o1, o2);
 //    const int o1width = o1.cols;
 //    const int o1height = o1.rows;
 //    cv::copyMakeBorder(o2, o2, o1height/2, o1height/2, o1width/2, o1width/2,
@@ -220,7 +219,7 @@ int main()
 
 //    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
     const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
-//    const std::string INPUT_FILE = "../../testimages/test2m.jpg";
+//    const std::string INPUT_FILE = "../../testimages/test4m.jpg";
 
     srand(time(nullptr));
 

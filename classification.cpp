@@ -84,8 +84,8 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
     for (const cv::Mat& v : obj1Variants)
     {
         cv::Mat result;
-//        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
-        cv::matchTemplate(v, obj2, result, cv::TM_SQDIFF_NORMED);
+        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
+//        cv::matchTemplate(v, obj2, result, cv::TM_SQDIFF_NORMED);
 //        cv::matchTemplate(v, obj2, result, cv::TM_CCORR_NORMED);
 //        showImg(result);
 
@@ -95,8 +95,8 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
         std::cout << minVal << "\n";
         std::cout << maxVal << "\n";
 
-//        if (maxVal > OBJECTS_ARE_SAME_THRESHOLD)
-        if (minVal < 0.45)
+        if (maxVal > OBJECTS_ARE_SAME_THRESHOLD)
+//        if (minVal < 0.4)
         {
             return true;
         }
