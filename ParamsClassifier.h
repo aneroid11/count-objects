@@ -1,7 +1,7 @@
 #ifndef COUNT_OBJECTS_PARAMSCLASSIFIER_H
 #define COUNT_OBJECTS_PARAMSCLASSIFIER_H
 
-#include "classification.h"
+#include "Classifier.h"
 
 class ParamsClassifier : public Classifier
 {

@@ -1,7 +1,7 @@
 #ifndef COUNT_OBJECTS_TEMPLATEMATCHCLASSIFIER_H
 #define COUNT_OBJECTS_TEMPLATEMATCHCLASSIFIER_H
 
-#include "classification.h"
+#include "Classifier.h"
 
 class TemplateMatchClassifier : public Classifier {
 public:

@@ -1,4 +1,4 @@
-#include "classification.h"
+#include "Classifier.h"
 
 Classifier::Classifier(const std::vector<cv::Mat> &objects, const std::vector<std::vector<cv::Point>> &contours)
     : _objects(objects), _contours(contours)

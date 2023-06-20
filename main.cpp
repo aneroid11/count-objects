@@ -1,8 +1,6 @@
-#include <unordered_map>
 #include <chrono>
 
-#include "objectextraction.h"
-#include "utils.h"
+#include "ObjectsExtractor.h"
 #include "TemplateMatchClassifier.h"
 #include "ParamsClassifier.h"
 

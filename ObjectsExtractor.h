@@ -1,5 +1,5 @@
-#ifndef COUNT_OBJECTS_OBJECTEXTRACTION_H
-#define COUNT_OBJECTS_OBJECTEXTRACTION_H
+#ifndef COUNT_OBJECTS_OBJECTSEXTRACTOR_H
+#define COUNT_OBJECTS_OBJECTSEXTRACTOR_H
 
 #include <vector>
 
@@ -27,9 +27,4 @@ private:
     std::vector<std::vector<cv::Point>> _contours;
 };
 
-void findContoursCanny(const cv::Mat& img, std::vector<std::vector<cv::Point>>& contours);
-void extractObjects(const cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours,
-                    std::vector<cv::Mat>& objects);
-void showObjects(const std::vector<cv::Mat>& objects);
-
-#endif //COUNT_OBJECTS_OBJECTEXTRACTION_H
+#endif //COUNT_OBJECTS_OBJECTSEXTRACTOR_H

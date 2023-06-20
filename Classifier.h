@@ -1,5 +1,5 @@
-#ifndef COUNT_OBJECTS_CLASSIFICATION_H
-#define COUNT_OBJECTS_CLASSIFICATION_H
+#ifndef COUNT_OBJECTS_CLASSIFIER_H
+#define COUNT_OBJECTS_CLASSIFIER_H
 
 #include "utils.h"
 
@@ -20,4 +20,4 @@ protected:
     const std::vector<std::vector<cv::Point>>& _contours;
 };
 
-#endif //COUNT_OBJECTS_CLASSIFICATION_H
+#endif //COUNT_OBJECTS_CLASSIFIER_H
