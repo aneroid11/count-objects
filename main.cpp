@@ -1,4 +1,5 @@
 #include <unordered_map>
+#include <chrono>
 
 #include "objectextraction.h"
 #include "classification.h"
@@ -210,12 +211,11 @@ int main()
 
 //    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
 //    const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
-    const std::string INPUT_FILE = "../../testimages/test2.jpg";
+    const std::string INPUT_FILE = "../../testimages/test4.jpg";
 
     srand(time(nullptr));
 
     cv::Mat img = cv::imread(INPUT_FILE);
-//    cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
     std::vector<std::vector<cv::Point>> contours;
     findContoursCanny(img, contours);
@@ -228,8 +228,13 @@ int main()
 
     // std::unique_ptr<Classifier> classifier = new ParamsClassifier(objects, contours);
     // classifier.classify(objClasses);
-    classifyUsingTemplateMatching(objects, contours, objClasses);
-//    classifyUsingObjParams(objects, contours, objClasses);
+
+    auto begin = std::chrono::system_clock::now();
+//    classifyUsingTemplateMatching(objects, contours, objClasses);
+    classifyUsingObjParams(objects, contours, objClasses);
+    auto end = std::chrono::system_clock::now();
+    auto deltaTime = end - begin;
+    std::cout << std::chrono::duration<double>(deltaTime).count() << "\n";
 
     drawClassification(img, contours, objClasses);
     showImg(img);

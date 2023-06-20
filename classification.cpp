@@ -96,8 +96,8 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
         double maxVal, minVal;
         cv::minMaxLoc(result, &minVal, &maxVal);
 
-        std::cout << "min val: " << minVal << "\n";
-        std::cout << "max val: " << maxVal << "\n\n";
+//        std::cout << "min val: " << minVal << "\n";
+//        std::cout << "max val: " << maxVal << "\n\n";
 
         if (maxVal > OBJECTS_ARE_SAME_THRESHOLD)
 //        if (minVal < 0.4)
