@@ -32,9 +32,7 @@ void getSortedFrequencies(const std::vector<int>& vec, std::vector<std::pair<int
 cv::Vec3f computeDominantColor(const cv::Mat& img)
 {
     cv::Mat data;
-    std::cout << "before\n";
     img.convertTo(data, CV_32F);
-    std::cout << "before\n";
 
     data = data.reshape(1, data.total());
 
@@ -105,13 +103,6 @@ void classifyUsingTemplateMatching(std::vector<cv::Mat>& objects, const std::vec
 
 bool compareObjects(const ObjectParams& o1, const ObjectParams& o2)
 {
-    std::cout << o1.domR << "\n";
-    std::cout << o1.domG << "\n";
-    std::cout << o1.domB << "\n";
-    std::cout << o2.domR << "\n";
-    std::cout << o2.domG << "\n";
-    std::cout << o2.domB << "\n\n";
-
     if (std::min(o1.area, o2.area) / std::max(o1.area, o2.area) < 0.85) { return false; }
     if (std::min(o1.perim, o2.perim) / std::max(o1.perim, o2.perim) < 0.85) { return false; }
     if (std::min(o1.compact, o2.compact) / std::max(o1.compact, o2.compact) < 0.8) { return false; }
@@ -218,8 +209,8 @@ int main()
 //    testMatchTemplate();
 
 //    const std::string INPUT_FILE = "../../testimages/testmila_m.jpg";
-    const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
-//    const std::string INPUT_FILE = "../../testimages/test4m.jpg";
+//    const std::string INPUT_FILE = "../../testimages/whitebg.jpg";
+    const std::string INPUT_FILE = "../../testimages/test2.jpg";
 
     srand(time(nullptr));
 
@@ -237,11 +228,13 @@ int main()
 
     // std::unique_ptr<Classifier> classifier = new ParamsClassifier(objects, contours);
     // classifier.classify(objClasses);
-//    classifyUsingTemplateMatching(objects, contours, objClasses);
-    classifyUsingObjParams(objects, contours, objClasses);
+    classifyUsingTemplateMatching(objects, contours, objClasses);
+//    classifyUsingObjParams(objects, contours, objClasses);
 
     drawClassification(img, contours, objClasses);
     showImg(img);
+
+    cv::imwrite("output.jpg", img);
 
     return 0;
 }

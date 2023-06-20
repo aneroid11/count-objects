@@ -64,7 +64,7 @@ void getObjVariants(const cv::Mat& obj, std::vector<cv::Mat>& variants)
 
 bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
 {
-    const double OBJECTS_ARE_SAME_THRESHOLD = 0.6;
+    const double OBJECTS_ARE_SAME_THRESHOLD = 0.75;
 
     cv::Mat obj1 = o1;
     cv::Mat obj2;
@@ -75,25 +75,29 @@ bool compareObjects(const cv::Mat& o1, const cv::Mat& o2)
     std::vector<cv::Mat> obj1Variants;
     getObjVariants(obj1, obj1Variants);
 
-    cv::imwrite("o1.jpg", obj1);
-    cv::imwrite("o2.jpg", obj2);
+//    cv::imwrite("o1.jpg", obj1);
+//    cv::imwrite("o2.jpg", obj2);
 
-//    showImg(obj1);
-//    showImg(obj2);
+    if (0)
+    {
+        std::cout << "compare this objects:\n";
+        showImg(obj1);
+        showImg(obj2);
+    }
 
     for (const cv::Mat& v : obj1Variants)
     {
         cv::Mat result;
-        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
+//        cv::matchTemplate(v, obj2, result, cv::TM_CCOEFF_NORMED);
 //        cv::matchTemplate(v, obj2, result, cv::TM_SQDIFF_NORMED);
-//        cv::matchTemplate(v, obj2, result, cv::TM_CCORR_NORMED);
+        cv::matchTemplate(v, obj2, result, cv::TM_CCORR_NORMED);
 //        showImg(result);
 
         double maxVal, minVal;
         cv::minMaxLoc(result, &minVal, &maxVal);
 
-        std::cout << minVal << "\n";
-        std::cout << maxVal << "\n";
+        std::cout << "min val: " << minVal << "\n";
+        std::cout << "max val: " << maxVal << "\n\n";
 
         if (maxVal > OBJECTS_ARE_SAME_THRESHOLD)
 //        if (minVal < 0.4)
@@ -137,7 +141,7 @@ void classifyObjects(const std::vector<cv::Mat>& objects, std::vector<std::vecto
         {
             const int pairInd = objInds[i];
 
-            std::cout << "compare:\n";
+//            std::cout << "compare:\n";
 
 //            cv::imwrite("o1.jpg", objects[first]);
 //            cv::imwrite("o2.jpg", objects[pairInd]);
