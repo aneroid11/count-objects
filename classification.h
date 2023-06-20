@@ -8,6 +8,7 @@ class Classifier
 public:
     Classifier(const std::vector<cv::Mat>& objects, const std::vector<std::vector<cv::Point>>& contours);
     Classifier(const Classifier& other) = delete;
+    virtual ~Classifier() = default;
 
     void classify(std::vector<std::vector<int>>& classes);
     void drawClassification(cv::Mat& img, const std::vector<std::vector<int>>& objClasses);

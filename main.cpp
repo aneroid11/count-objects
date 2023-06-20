@@ -4,6 +4,7 @@
 #include "objectextraction.h"
 #include "classification.h"
 #include "utils.h"
+#include "TemplateMatchClassifier.h"
 
 struct ObjectParams
 {
@@ -230,13 +231,16 @@ int main()
     // classifier.classify(objClasses);
 
     auto begin = std::chrono::system_clock::now();
-    classifyUsingTemplateMatching(objects, contours, objClasses);
+    std::unique_ptr<Classifier> classifier(new TemplateMatchClassifier(objects, contours));
+    classifier->classify(objClasses);
+//    classifyUsingTemplateMatching(objects, contours, objClasses);
 //    classifyUsingObjParams(objects, contours, objClasses);
     auto end = std::chrono::system_clock::now();
     auto deltaTime = end - begin;
-    std::cout << std::chrono::duration<double>(deltaTime).count() << "\n";
+    std::cout << std::chrono::duration<double>(deltaTime).count() << " seconds\n";
 
-    drawClassification(img, contours, objClasses);
+    classifier->drawClassification(img, objClasses);
+//    drawClassification(img, contours, objClasses);
     showImg(img);
 
     cv::imwrite("output.jpg", img);
