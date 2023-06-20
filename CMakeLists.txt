@@ -5,5 +5,5 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
-add_executable(count_objects main.cpp objectextraction.h objectextraction.cpp utils.cpp utils.h classification.h classification.cpp)
+add_executable(count_objects main.cpp objectextraction.h objectextraction.cpp utils.cpp utils.h classification.h classification.cpp TemplateMatchClassifier.h TemplateMatchClassifier.cpp)
 target_link_libraries(count_objects ${OpenCV_LIBS})

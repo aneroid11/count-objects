@@ -230,8 +230,8 @@ int main()
     // classifier.classify(objClasses);
 
     auto begin = std::chrono::system_clock::now();
-//    classifyUsingTemplateMatching(objects, contours, objClasses);
-    classifyUsingObjParams(objects, contours, objClasses);
+    classifyUsingTemplateMatching(objects, contours, objClasses);
+//    classifyUsingObjParams(objects, contours, objClasses);
     auto end = std::chrono::system_clock::now();
     auto deltaTime = end - begin;
     std::cout << std::chrono::duration<double>(deltaTime).count() << "\n";
